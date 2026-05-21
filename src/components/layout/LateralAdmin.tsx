@@ -13,7 +13,7 @@ import { menuItems, bottomItems } from "../../constants/admin-menu";
 
 
 export default function AdminHeader() {
-  const [menuOpen, setMenuOpen] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
 
 
   return (

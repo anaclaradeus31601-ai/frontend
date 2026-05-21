@@ -85,7 +85,14 @@ export default function IndexContracts() {
     const [search, setSearch] = useState("");
 
     if(search !== "") {
-        contracts = contracts.filter(contract => contract.client.toLowerCase().includes(search.toLowerCase()));
+        contracts = contracts.filter(contract =>
+         contract.client.toLowerCase().includes(search.toLowerCase()) ||
+         contract.value.toString().includes(search.toLowerCase()) ||
+         contract.docUrl.toLowerCase().includes(search.toLowerCase()) ||
+         contract.endDate.toString().includes(search.toLowerCase()) ||
+         contract.startDate.toLowerCase().includes(search.toLowerCase()) ||
+         contract.status.toLowerCase().includes(search.toLowerCase())
+        );
     }
 
 
@@ -110,7 +117,8 @@ export default function IndexContracts() {
     
 
     return (
-        <div className="p-6">
+        <div className="p-6 space-y-6">
+            <h2 className="text-2xl font-bold tracking-tight">Contratos</h2>
             <div className="flex flex-col justify-center">
                 <div className="flex flex-row">
                     <Button onClick={()=>{

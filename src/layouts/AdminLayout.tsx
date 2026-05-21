@@ -7,7 +7,7 @@ export default function AdminLayout() {
     return (
         <div className="flex h-screen w-screen">
             <AdminHeader/>
-            <main className="flex-1  overflow-y-auto">
+            <main className="flex-1 bg-background  overflow-y-auto">
                 <TopAdmin/>
                 <Outlet/>
             </main>

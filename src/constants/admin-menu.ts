@@ -7,6 +7,7 @@ import {
   UserCircle,
   Users,
   Wallet,
+  HandshakeIcon,
   type LucideIcon,
 } from "lucide-react";
 
@@ -27,6 +28,11 @@ export const menuItems : MenuItem[] = [
     label: "Análises",
     icon: BarChart3,
     href: "/admin/analytics",
+  },
+  {
+    label: "Visitas",
+    icon: HandshakeIcon,
+    href: "/admin/visits",
   },
   {
     label: "Imóveis",

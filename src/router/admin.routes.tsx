@@ -26,6 +26,8 @@ import ShowSettings from "../pages/admin/Configurations/Show"
 import Medias from "../pages/admin/Medias/Media"
 import IndexOwners from "../pages/admin/Owners/Index"
 import IndexContracts from "../pages/admin/Contracts/Index"
+import IndexVisits from "../pages/admin/Visits/Index"
+import Analyitcs from "../pages/admin/Analytics/Analytics"
 
 
 export const AdminRoutes: RouteObject[] = [
@@ -86,6 +88,9 @@ export const AdminRoutes: RouteObject[] = [
     },
     // visits
     {
+      path: "visits",
+      element: <IndexVisits />,
+    },{
       path: "visits/:id",
       element: <ShowVisits />,
     },
@@ -145,10 +150,15 @@ export const AdminRoutes: RouteObject[] = [
       path: "settings",
       element: <ShowSettings />,
     },
+    {
+      path: "analytics",
+      element: <Analyitcs />,
+    },
     //medias
     {
       path: "medias",
       element: <Medias />,
-    }
+    },
+    
   ]
 },]

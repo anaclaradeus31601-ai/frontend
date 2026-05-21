@@ -32,24 +32,27 @@ import AdminHome from "./pages/admin/Home";
 import ShowSettings from "./pages/admin/Configurations/Show";
 import IndexOwners from "./pages/admin/Owners/Index";
 import IndexContracts from "./pages/admin/Contracts/Index";
+import IndexVisits from "./pages/admin/Visits/Index";
+import DefaultLayout from "./layouts/DefaultLayout";
+
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/" element={<Home />} />
 
-
-
-        {/* criar donos de casas e apartamentos/imoveis */}
-        <Route path="/owner" element={<CreateOwner/>} />
 
         {/* imoveis */}
         <Route path="/preview" element={<CreateProperty/>} />
         <Route path="/show-property" element={<ShowProperty/>} />
 
 
+
+        {/* public */}
+        <Route path="/" element={<DefaultLayout/>}>
+          <Route index element={<Home />} />
+        </Route>
 
 
         {/* Admin Routes */}
@@ -77,7 +80,8 @@ export default function App() {
           <Route path="properties/edit/:id" element={<EditProperties />} />
 
           {/* Visits */}
-          <Route path="visits" element={<ShowVisits/>} />
+          <Route path="visits" element={<IndexVisits/>} />
+          <Route path="visits/:id" element={<ShowVisits/>} />
           <Route path="visits/create" element={<CreateVisits/>} />
           <Route path="visits/edit/:id" element={<EditVisits/>} />
 
