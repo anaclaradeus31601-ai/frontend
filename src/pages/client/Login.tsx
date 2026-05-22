@@ -1,27 +1,22 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
 import { Building2, Mail, Lock } from "lucide-react";
-import { loginSchema } from "../../validations/client-forms";
+import { useForm } from "../../hooks/use-form";
+import { loginFormSchema, type LoginFormData } from "../../validations/forms";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm(loginFormSchema);
 
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-
-  function handleLogin(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    const result = loginSchema.safeParse({ email, senha });
-
-    if (!result.success) {
-      window.alert(result.error.issues[0]?.message ?? "Revise os campos do formulário.");
-      return;
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      // TODO: Integrar com API de login
+      console.log("Login data:", data);
+      // const response = await apiRequest("/auth/login", { method: "POST", body: JSON.stringify(data) });
+      // login(response.user);
+      navigate("/");
+    } catch (error) {
+      console.error("Login failed:", error);
     }
-
-    console.log(email, senha);
-
-    navigate("/");
   }
 
   return (
@@ -91,7 +86,7 @@ export default function Login() {
 
           {/* Card */}
           <form
-            onSubmit={handleLogin}
+            onSubmit={handleSubmit(onSubmit)}
             className="
               relative
               z-10
@@ -137,7 +132,7 @@ export default function Login() {
 
             {/* Email */}
             <div className="mb-4">
-              <label className="text-sm text-zinc-300 mb-2 block">
+              <label htmlFor="email" className="text-sm text-zinc-300 mb-2 block">
                 Email
               </label>
 
@@ -145,16 +140,14 @@ export default function Login() {
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
 
                 <input
-                  required
+                  id="email"
                   type="email"
                   placeholder="seuemail@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="
+                  {...register("email")}
+                  className={`
                   w-full
                   rounded-xl
                   border
-                  border-white/10
                   bg-black/20
                   py-3
                   pl-10
@@ -164,17 +157,16 @@ export default function Login() {
                   placeholder:text-zinc-500
                   outline-none
                   transition
-                  focus:border-blue-500
-                  focus:ring-2
-                  focus:ring-blue-500/20
-                "
+                  ${errors.email ? "border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-blue-500 focus:ring-blue-500/20"}
+                `}
                 />
               </div>
+              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
             </div>
 
             {/* Password */}
             <div className="mb-4">
-              <label className="text-sm text-zinc-300 mb-2 block">
+              <label htmlFor="password" className="text-sm text-zinc-300 mb-2 block">
                 Senha
               </label>
 
@@ -182,16 +174,14 @@ export default function Login() {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
 
                 <input
-                  required
+                  id="password"
                   type="password"
                   placeholder="••••••••"
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
-                  className="
+                  {...register("password")}
+                  className={`
         w-full
         rounded-xl
         border
-        border-white/10
         bg-black/20
         py-3
         pl-10
@@ -201,12 +191,11 @@ export default function Login() {
         placeholder:text-zinc-500
         outline-none
         transition
-        focus:border-blue-500
-        focus:ring-2
-        focus:ring-blue-500/20
-      "
+        ${errors.password ? "border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-blue-500 focus:ring-blue-500/20"}
+      `}
                 />
               </div>
+              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
             </div>
 
             {/* Options */}
@@ -227,6 +216,7 @@ export default function Login() {
             {/* Button */}
             <button
               type="submit"
+              disabled={isSubmitting}
               className="
     w-full
     rounded-xl
@@ -238,9 +228,11 @@ export default function Login() {
     transition
     hover:bg-zinc-200
     active:scale-[0.99]
+    disabled:opacity-50
+    disabled:cursor-not-allowed
   "
             >
-              Entrar
+              {isSubmitting ? "Entrando..." : "Entrar"}
             </button>
 
             {/* Divider */}

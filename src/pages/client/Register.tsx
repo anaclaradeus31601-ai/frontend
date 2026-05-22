@@ -1,5 +1,4 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
 import {
   Building2,
   Mail,
@@ -7,41 +6,22 @@ import {
   User,
   Phone,
 } from "lucide-react";
-import { registerSchema } from "../../validations/client-forms";
+import { useForm } from "../../hooks/use-form";
+import { registerFormSchema, type RegisterFormData } from "../../validations/forms";
 
 export default function Register() {
   const navigate = useNavigate();
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm(registerFormSchema);
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
-  function handleRegister(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    const result = registerSchema.safeParse({
-      name,
-      email,
-      phone,
-      password,
-      confirmPassword,
-    });
-
-    if (!result.success) {
-      window.alert(result.error.issues[0]?.message ?? "Revise os campos do formulário.");
-      return;
+  const onSubmit = async (data: RegisterFormData) => {
+    try {
+      // TODO: Integrar com API de registro
+      console.log("Register data:", data);
+      // const response = await apiRequest("/auth/register", { method: "POST", body: JSON.stringify(data) });
+      navigate("/login");
+    } catch (error) {
+      console.error("Register failed:", error);
     }
-
-    console.log({
-      name,
-      email,
-      phone,
-      password,
-    });
-
-    navigate("/login");
   }
 
   return (
@@ -111,7 +91,7 @@ export default function Register() {
 
           {/* Card */}
           <form
-            onSubmit={handleRegister}
+            onSubmit={handleSubmit(onSubmit)}
             className="
             relative
             z-10
@@ -141,7 +121,7 @@ export default function Register() {
 
             {/* Nome */}
             <div className="mb-3">
-              <label className="text-xs text-zinc-300 mb-1 block">
+              <label htmlFor="name" className="text-xs text-zinc-300 mb-1 block">
                 Nome
               </label>
 
@@ -149,16 +129,14 @@ export default function Register() {
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />
 
                 <input
-                  required
+                  id="name"
                   type="text"
                   placeholder="Seu nome"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="
+                  {...register("name")}
+                  className={`
           w-full
           rounded-lg
           border
-          border-white/10
           bg-black/20
           py-2.5
           pl-9
@@ -168,17 +146,16 @@ export default function Register() {
           placeholder:text-zinc-500
           outline-none
           transition
-          focus:border-blue-500
-          focus:ring-2
-          focus:ring-blue-500/20
-        "
+          ${errors.name ? "border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-blue-500 focus:ring-blue-500/20"}
+        `}
                 />
               </div>
+              {errors.name && <p className="text-red-500 text-xs mt-0.5">{errors.name.message}</p>}
             </div>
 
             {/* Email */}
             <div className="mb-3">
-              <label className="text-xs text-zinc-300 mb-1 block">
+              <label htmlFor="email" className="text-xs text-zinc-300 mb-1 block">
                 Email
               </label>
 
@@ -186,16 +163,14 @@ export default function Register() {
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />
 
                 <input
-                  required
+                  id="email"
                   type="email"
                   placeholder="email@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="
+                  {...register("email")}
+                  className={`
           w-full
           rounded-lg
           border
-          border-white/10
           bg-black/20
           py-2.5
           pl-9
@@ -205,17 +180,16 @@ export default function Register() {
           placeholder:text-zinc-500
           outline-none
           transition
-          focus:border-blue-500
-          focus:ring-2
-          focus:ring-blue-500/20
-        "
+          ${errors.email ? "border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-blue-500 focus:ring-blue-500/20"}
+        `}
                 />
               </div>
+              {errors.email && <p className="text-red-500 text-xs mt-0.5">{errors.email.message}</p>}
             </div>
 
             {/* Telefone */}
             <div className="mb-3">
-              <label className="text-xs text-zinc-300 mb-1 block">
+              <label htmlFor="phone" className="text-xs text-zinc-300 mb-1 block">
                 Telefone
               </label>
 
@@ -223,16 +197,14 @@ export default function Register() {
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />
 
                 <input
-                  required
-                  type="text"
+                  id="phone"
+                  type="tel"
                   placeholder="(11) 99999-9999"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="
+                  {...register("phone")}
+                  className={`
           w-full
           rounded-lg
           border
-          border-white/10
           bg-black/20
           py-2.5
           pl-9
@@ -242,17 +214,16 @@ export default function Register() {
           placeholder:text-zinc-500
           outline-none
           transition
-          focus:border-blue-500
-          focus:ring-2
-          focus:ring-blue-500/20
-        "
+          ${errors.phone ? "border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-blue-500 focus:ring-blue-500/20"}
+        `}
                 />
               </div>
+              {errors.phone && <p className="text-red-500 text-xs mt-0.5">{errors.phone.message}</p>}
             </div>
 
             {/* Senha */}
             <div className="mb-3">
-              <label className="text-xs text-zinc-300 mb-1 block">
+              <label htmlFor="password" className="text-xs text-zinc-300 mb-1 block">
                 Senha
               </label>
 
@@ -260,20 +231,29 @@ export default function Register() {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />
 
                 <input
-                  required
+                  id="password"
                   type="password"
                   placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="
+                  {...register("password")}
+                  className={`
           w-full
           rounded-lg
           border
-          border-white/10
           bg-black/20
           py-2.5
           pl-9
           pr-3
+          text-sm
+          text-white
+          placeholder:text-zinc-500
+          outline-none
+          transition
+          ${errors.password ? "border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-blue-500 focus:ring-blue-500/20"}
+        `}
+                />
+              </div>
+              {errors.password && <p className="text-red-500 text-xs mt-0.5">{errors.password.message}</p>}
+            </div>
           text-sm
           text-white
           placeholder:text-zinc-500
@@ -289,7 +269,7 @@ export default function Register() {
 
             {/* Confirmar senha */}
             <div className="mb-5">
-              <label className="text-xs text-zinc-300 mb-1 block">
+              <label htmlFor="confirmPassword" className="text-xs text-zinc-300 mb-1 block">
                 Confirmar senha
               </label>
 
@@ -297,16 +277,14 @@ export default function Register() {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />
 
                 <input
-                  required
+                  id="confirmPassword"
                   type="password"
                   placeholder="••••••••"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="
+                  {...register("confirmPassword")}
+                  className={`
           w-full
           rounded-lg
           border
-          border-white/10
           bg-black/20
           py-2.5
           pl-9
@@ -316,17 +294,17 @@ export default function Register() {
           placeholder:text-zinc-500
           outline-none
           transition
-          focus:border-blue-500
-          focus:ring-2
-          focus:ring-blue-500/20
-        "
+          ${errors.confirmPassword ? "border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-blue-500 focus:ring-blue-500/20"}
+        `}
                 />
               </div>
+              {errors.confirmPassword && <p className="text-red-500 text-xs mt-0.5">{errors.confirmPassword.message}</p>}
             </div>
 
             {/* Button */}
             <button
               type="submit"
+              disabled={isSubmitting}
               className="
       w-full
       rounded-lg
@@ -338,9 +316,11 @@ export default function Register() {
       transition
       hover:bg-zinc-200
       active:scale-[0.99]
+      disabled:opacity-50
+      disabled:cursor-not-allowed
     "
             >
-              Criar conta
+              {isSubmitting ? "Criando conta..." : "Criar conta"}
             </button>
 
             {/* Footer */}

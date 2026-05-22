@@ -8,5 +8,4 @@ export const router = createBrowserRouter([
   ...AdminRoutes,
   ...RealtorRoutes,
   ...AuthRoutes,
-
 ]);

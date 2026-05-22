@@ -5,11 +5,23 @@ import { Label } from "#components/ui/label";
 import { Textarea } from "#components/ui/textarea";
 import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { createZodFormHandler } from "../../../lib/zod-form";
-import { createOwnerSchema } from "../../../validations/admin-forms";
+import { useForm } from "../../../hooks/use-form";
+import { createOwnerFormSchema, type CreateOwnerFormData } from "../../../validations/forms";
 
 export default function CreateOwners() {
     const navigate = useNavigate();
+    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm(createOwnerFormSchema);
+
+    const onSubmit = async (data: CreateOwnerFormData) => {
+        try {
+            // TODO: Integrar com API
+            console.log("Owner data:", data);
+            // const response = await apiRequest("/admin/owners", { method: "POST", body: JSON.stringify(data) });
+            navigate(-1);
+        } catch (error) {
+            console.error("Failed to create owner:", error);
+        }
+    }
 
     return (
         <div className="p-6 space-y-6">
@@ -23,7 +35,7 @@ export default function CreateOwners() {
                 <p className="text-sm text-muted-foreground">Cadastre os dados do proprietário de acordo com a tabela Owner.</p>
             </div>
 
-            <form className="space-y-6" onSubmit={createZodFormHandler(createOwnerSchema)}>
+            <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
                 <Card>
                     <CardHeader>
                         <CardTitle>Dados principais</CardTitle>
@@ -31,20 +43,45 @@ export default function CreateOwners() {
                     </CardHeader>
                     <CardContent className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2 md:col-span-2">
-                            <Label htmlFor="owner-name">Nome completo</Label>
-                            <Input id="owner-name" placeholder="Maria Oliveira" />
+                            <Label htmlFor="name">Nome completo *</Label>
+                            <Input 
+                                id="name" 
+                                placeholder="Maria Oliveira"
+                                {...register("name")}
+                                className={errors.name ? "border-red-500" : ""}
+                            />
+                            {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="owner-cpf">CPF/CNPJ</Label>
-                            <Input id="owner-cpf" placeholder="000.000.000-00" />
+                            <Label htmlFor="cpfCnpj">CPF/CNPJ *</Label>
+                            <Input 
+                                id="cpfCnpj" 
+                                placeholder="000.000.000-00"
+                                {...register("cpfCnpj")}
+                                className={errors.cpfCnpj ? "border-red-500" : ""}
+                            />
+                            {errors.cpfCnpj && <p className="text-sm text-red-500">{errors.cpfCnpj.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="owner-email">E-mail</Label>
-                            <Input id="owner-email" type="email" placeholder="proprietario@email.com" />
+                            <Label htmlFor="email">E-mail *</Label>
+                            <Input 
+                                id="email" 
+                                type="email" 
+                                placeholder="proprietario@email.com"
+                                {...register("email")}
+                                className={errors.email ? "border-red-500" : ""}
+                            />
+                            {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="owner-phone">Telefone</Label>
-                            <Input id="owner-phone" placeholder="(11) 99999-9999" />
+                            <Label htmlFor="phone">Telefone *</Label>
+                            <Input 
+                                id="phone" 
+                                placeholder="(11) 99999-9999"
+                                {...register("phone")}
+                                className={errors.phone ? "border-red-500" : ""}
+                            />
+                            {errors.phone && <p className="text-sm text-red-500">{errors.phone.message}</p>}
                         </div>
                     </CardContent>
                 </Card>
@@ -56,14 +93,22 @@ export default function CreateOwners() {
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-2">
-                            <Label htmlFor="owner-address">Endereço</Label>
-                            <Textarea id="owner-address" placeholder="Rua, número, bairro, cidade e estado." />
+                            <Label htmlFor="address">Endereço</Label>
+                            <Textarea 
+                                id="address" 
+                                placeholder="Rua, número, bairro, cidade e estado."
+                                {...register("address")}
+                                className={errors.address ? "border-red-500" : ""}
+                            />
+                            {errors.address && <p className="text-sm text-red-500">{errors.address.message}</p>}
                         </div>
                     </CardContent>
                 </Card>
 
                 <div className="flex justify-end gap-3">
-                    <Button type="submit">Salvar proprietário</Button>
+                    <Button type="submit" disabled={isSubmitting}>
+                        {isSubmitting ? "Salvando..." : "Salvar proprietário"}
+                    </Button>
                 </div>
             </form>
         </div>

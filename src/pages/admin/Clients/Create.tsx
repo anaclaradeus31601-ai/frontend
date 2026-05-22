@@ -5,12 +5,24 @@ import { Label } from "#components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "#components/ui/select";
 import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useForm } from "../../../hooks/use-form";
+import { createClientFormSchema, type CreateClientFormData } from "../../../validations/forms";
 import { UserRole } from "../../../types/database";
-import { createZodFormHandler } from "../../../lib/zod-form";
-import { createClientSchema } from "../../../validations/admin-forms";
 
 export default function CreateClients() {
     const navigate = useNavigate();
+    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm(createClientFormSchema);
+
+    const onSubmit = async (data: CreateClientFormData) => {
+        try {
+            console.log("Client data:", data);
+            // TODO: Integrar com API
+            // const response = await apiRequest("/admin/clients", { method: "POST", body: JSON.stringify(data) });
+            navigate(-1);
+        } catch (error) {
+            console.error("Failed to create client:", error);
+        }
+    }
 
     return (
         <div className="p-6 space-y-6">
@@ -24,7 +36,7 @@ export default function CreateClients() {
                 <p className="text-sm text-muted-foreground">Cadastre um novo cliente de acordo com os campos da tabela User.</p>
             </div>
 
-            <form className="space-y-6" onSubmit={createZodFormHandler(createClientSchema)}>
+            <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
                 <Card>
                     <CardHeader>
                         <CardTitle>Dados pessoais</CardTitle>
@@ -32,20 +44,46 @@ export default function CreateClients() {
                     </CardHeader>
                     <CardContent className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
-                            <Label htmlFor="client-name">Nome</Label>
-                            <Input id="client-name" placeholder="João da Silva" />
+                            <Label htmlFor="name">Nome *</Label>
+                            <Input
+                                id="name"
+                                placeholder="João da Silva"
+                                {...register("name")}
+                                className={errors.name ? "border-red-500" : ""}
+                            />
+                            {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="client-email">E-mail</Label>
-                            <Input id="client-email" type="email" placeholder="cliente@email.com" />
+                            <Label htmlFor="email">E-mail *</Label>
+                            <Input
+                                id="email"
+                                type="email"
+                                placeholder="cliente@email.com"
+                                {...register("email")}
+                                className={errors.email ? "border-red-500" : ""}
+                            />
+                            {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="client-password">Senha</Label>
-                            <Input id="client-password" type="password" placeholder="Senha inicial" />
+                            <Label htmlFor="password">Senha *</Label>
+                            <Input
+                                id="password"
+                                type="password"
+                                placeholder="Senha inicial"
+                                {...register("password")}
+                                className={errors.password ? "border-red-500" : ""}
+                            />
+                            {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="client-phone">Telefone</Label>
-                            <Input id="client-phone" placeholder="(11) 99999-9999" />
+                            <Label htmlFor="phone">Telefone</Label>
+                            <Input
+                                id="phone"
+                                placeholder="(11) 99999-9999"
+                                {...register("phone")}
+                                className={errors.phone ? "border-red-500" : ""}
+                            />
+                            {errors.phone && <p className="text-sm text-red-500">{errors.phone.message}</p>}
                         </div>
                     </CardContent>
                 </Card>
@@ -57,7 +95,7 @@ export default function CreateClients() {
                     </CardHeader>
                     <CardContent className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
-                            <Label>Role</Label>
+                            <Label>Role *</Label>
                             <Select defaultValue={UserRole.CLIENT}>
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Selecione" />
@@ -82,14 +120,22 @@ export default function CreateClients() {
                             </Select>
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="client-avatar">Avatar</Label>
-                            <Input id="client-avatar" placeholder="https://..." />
+                            <Label htmlFor="avatar">Avatar</Label>
+                            <Input
+                                id="avatar"
+                                placeholder="https://..."
+                                {...register("avatar")}
+                                className={errors.avatar ? "border-red-500" : ""}
+                            />
+                            {errors.avatar && <p className="text-sm text-red-500">{errors.avatar.message}</p>}
                         </div>
                     </CardContent>
                 </Card>
 
                 <div className="flex justify-end gap-3">
-                    <Button type="submit">Salvar cliente</Button>
+                    <Button type="submit" disabled={isSubmitting}>
+                        {isSubmitting ? "Salvando..." : "Salvar cliente"}
+                    </Button>
                 </div>
             </form>
         </div>

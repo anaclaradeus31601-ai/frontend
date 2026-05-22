@@ -9,13 +9,25 @@ import { useNavigate } from "react-router-dom";
 import { RelationSelect } from "#components/admin/relation-select";
 import { useOwners, useRealtors } from "../../../hooks";
 import { PropertyStatus, PropertyType, TransactionType } from "../../../types/database";
-import { createZodFormHandler } from "../../../lib/zod-form";
-import { createPropertySchema } from "../../../validations/admin-forms";
+import { useForm } from "../../../hooks/use-form";
+import { createPropertyFormSchema, type CreatePropertyFormData } from "../../../validations/forms";
 
 export default function CreateProperties() {
     const navigate = useNavigate();
     const { data: owners } = useOwners();
     const { data: realtors } = useRealtors();
+    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm(createPropertyFormSchema);
+
+    const onSubmit = async (data: CreatePropertyFormData) => {
+        try {
+            console.log("Property data:", data);
+            // TODO: Integrar com API
+            // const response = await apiRequest("/admin/properties", { method: "POST", body: JSON.stringify(data) });
+            navigate(-1);
+        } catch (error) {
+            console.error("Failed to create property:", error);
+        }
+    }
 
     const ownerOptions = owners.map((owner) => ({
         id: owner.id,
@@ -47,7 +59,7 @@ export default function CreateProperties() {
                 </Button>
             </div>
 
-            <form className="space-y-6" onSubmit={createZodFormHandler(createPropertySchema)}>
+            <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
                 <Card>
                     <CardHeader>
                         <CardTitle>Informações principais</CardTitle>
@@ -55,11 +67,17 @@ export default function CreateProperties() {
                     </CardHeader>
                     <CardContent className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2 md:col-span-2">
-                            <Label htmlFor="property-title">Título</Label>
-                            <Input id="property-title" placeholder="Casa moderna com piscina" />
+                            <Label htmlFor="title">Título *</Label>
+                            <Input
+                                id="title"
+                                placeholder="Casa moderna com piscina"
+                                {...register("title")}
+                                className={errors.title ? "border-red-500" : ""}
+                            />
+                            {errors.title && <p className="text-sm text-red-500">{errors.title.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label>Tipo de negociação</Label>
+                            <Label>Tipo de negociação *</Label>
                             <Select>
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Selecione" />
@@ -71,7 +89,7 @@ export default function CreateProperties() {
                             </Select>
                         </div>
                         <div className="space-y-2">
-                            <Label>Categoria</Label>
+                            <Label>Categoria *</Label>
                             <Select>
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Selecione" />
@@ -83,7 +101,7 @@ export default function CreateProperties() {
                             </Select>
                         </div>
                         <div className="space-y-2 md:col-span-2">
-                            <Label>Status</Label>
+                            <Label>Status *</Label>
                             <Select defaultValue={PropertyStatus.AVAILABLE}>
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Selecione" />
@@ -98,16 +116,34 @@ export default function CreateProperties() {
                             </Select>
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="property-rent-price">Valor do aluguel</Label>
-                            <Input id="property-rent-price" placeholder="R$ 2.500,00" />
+                            <Label htmlFor="rentPrice">Valor do aluguel</Label>
+                            <Input
+                                id="rentPrice"
+                                placeholder="R$ 2.500,00"
+                                {...register("rentPrice")}
+                                className={errors.rentPrice ? "border-red-500" : ""}
+                            />
+                            {errors.rentPrice && <p className="text-sm text-red-500">{errors.rentPrice.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="property-sale-price">Valor da venda</Label>
-                            <Input id="property-sale-price" placeholder="R$ 750.000,00" />
+                            <Label htmlFor="salePrice">Valor da venda</Label>
+                            <Input
+                                id="salePrice"
+                                placeholder="R$ 750.000,00"
+                                {...register("salePrice")}
+                                className={errors.salePrice ? "border-red-500" : ""}
+                            />
+                            {errors.salePrice && <p className="text-sm text-red-500">{errors.salePrice.message}</p>}
                         </div>
                         <div className="space-y-2 md:col-span-2">
-                            <Label htmlFor="property-description">Descrição</Label>
-                            <Textarea id="property-description" placeholder="Destaques do imóvel, diferenciais e acabamento." />
+                            <Label htmlFor="description">Descrição *</Label>
+                            <Textarea
+                                id="description"
+                                placeholder="Destaques do imóvel, diferenciais e acabamento."
+                                {...register("description")}
+                                className={errors.description ? "border-red-500" : ""}
+                            />
+                            {errors.description && <p className="text-sm text-red-500">{errors.description.message}</p>}
                         </div>
                     </CardContent>
                 </Card>
@@ -119,52 +155,132 @@ export default function CreateProperties() {
                     </CardHeader>
                     <CardContent className="grid gap-4 md:grid-cols-4">
                         <div className="space-y-2">
-                            <Label htmlFor="property-bedrooms">Quartos</Label>
-                            <Input id="property-bedrooms" type="number" min="0" placeholder="3" />
+                            <Label htmlFor="bedrooms">Quartos *</Label>
+                            <Input
+                                id="bedrooms"
+                                type="number"
+                                min="0"
+                                placeholder="3"
+                                {...register("bedrooms")}
+                                className={errors.bedrooms ? "border-red-500" : ""}
+                            />
+                            {errors.bedrooms && <p className="text-sm text-red-500">{errors.bedrooms.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="property-bathrooms">Banheiros</Label>
-                            <Input id="property-bathrooms" type="number" min="0" placeholder="2" />
+                            <Label htmlFor="bathrooms">Banheiros *</Label>
+                            <Input
+                                id="bathrooms"
+                                type="number"
+                                min="0"
+                                placeholder="2"
+                                {...register("bathrooms")}
+                                className={errors.bathrooms ? "border-red-500" : ""}
+                            />
+                            {errors.bathrooms && <p className="text-sm text-red-500">{errors.bathrooms.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="property-garages">Garagens</Label>
-                            <Input id="property-garages" type="number" min="0" placeholder="2" />
+                            <Label htmlFor="garages">Garagens *</Label>
+                            <Input
+                                id="garages"
+                                type="number"
+                                min="0"
+                                placeholder="2"
+                                {...register("garages")}
+                                className={errors.garages ? "border-red-500" : ""}
+                            />
+                            {errors.garages && <p className="text-sm text-red-500">{errors.garages.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="property-area">Área (m²)</Label>
-                            <Input id="property-area" type="number" min="0" placeholder="150" />
+                            <Label htmlFor="area">Área (m²) *</Label>
+                            <Input
+                                id="area"
+                                type="number"
+                                min="0"
+                                placeholder="150"
+                                {...register("area")}
+                                className={errors.area ? "border-red-500" : ""}
+                            />
+                            {errors.area && <p className="text-sm text-red-500">{errors.area.message}</p>}
                         </div>
                         <div className="space-y-2 md:col-span-2">
-                            <Label htmlFor="property-street">Rua</Label>
-                            <Input id="property-street" placeholder="Av. Beira Mar" />
+                            <Label htmlFor="street">Rua *</Label>
+                            <Input
+                                id="street"
+                                placeholder="Av. Beira Mar"
+                                {...register("street")}
+                                className={errors.street ? "border-red-500" : ""}
+                            />
+                            {errors.street && <p className="text-sm text-red-500">{errors.street.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="property-number">Número</Label>
-                            <Input id="property-number" placeholder="2500" />
+                            <Label htmlFor="number">Número *</Label>
+                            <Input
+                                id="number"
+                                placeholder="2500"
+                                {...register("number")}
+                                className={errors.number ? "border-red-500" : ""}
+                            />
+                            {errors.number && <p className="text-sm text-red-500">{errors.number.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="property-complement">Complemento</Label>
-                            <Input id="property-complement" placeholder="Apto 302" />
+                            <Label htmlFor="complement">Complemento</Label>
+                            <Input
+                                id="complement"
+                                placeholder="Apto 302"
+                                {...register("complement")}
+                                className={errors.complement ? "border-red-500" : ""}
+                            />
+                            {errors.complement && <p className="text-sm text-red-500">{errors.complement.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="property-neighborhood">Bairro</Label>
-                            <Input id="property-neighborhood" placeholder="Jurerê" />
+                            <Label htmlFor="neighborhood">Bairro *</Label>
+                            <Input
+                                id="neighborhood"
+                                placeholder="Jurerê"
+                                {...register("neighborhood")}
+                                className={errors.neighborhood ? "border-red-500" : ""}
+                            />
+                            {errors.neighborhood && <p className="text-sm text-red-500">{errors.neighborhood.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="property-city">Cidade</Label>
-                            <Input id="property-city" placeholder="Florianópolis" />
+                            <Label htmlFor="city">Cidade *</Label>
+                            <Input
+                                id="city"
+                                placeholder="Florianópolis"
+                                {...register("city")}
+                                className={errors.city ? "border-red-500" : ""}
+                            />
+                            {errors.city && <p className="text-sm text-red-500">{errors.city.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="property-state">Estado</Label>
-                            <Input id="property-state" placeholder="SC" />
+                            <Label htmlFor="state">Estado *</Label>
+                            <Input
+                                id="state"
+                                placeholder="SC"
+                                {...register("state")}
+                                className={errors.state ? "border-red-500" : ""}
+                            />
+                            {errors.state && <p className="text-sm text-red-500">{errors.state.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="property-zip-code">CEP</Label>
-                            <Input id="property-zip-code" placeholder="00000-000" />
+                            <Label htmlFor="zipCode">CEP *</Label>
+                            <Input
+                                id="zipCode"
+                                placeholder="00000-000"
+                                {...register("zipCode")}
+                                className={errors.zipCode ? "border-red-500" : ""}
+                            />
+                            {errors.zipCode && <p className="text-sm text-red-500">{errors.zipCode.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="property-country">País</Label>
-                            <Input id="property-country" defaultValue="Brasil" />
+                            <Label htmlFor="country">País *</Label>
+                            <Input
+                                id="country"
+                                defaultValue="Brasil"
+                                {...register("country")}
+                                className={errors.country ? "border-red-500" : ""}
+                            />
+                            {errors.country && <p className="text-sm text-red-500">{errors.country.message}</p>}
                         </div>
                     </CardContent>
                 </Card>
@@ -176,20 +292,48 @@ export default function CreateProperties() {
                     </CardHeader>
                     <CardContent className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
-                            <Label htmlFor="property-condominium-fee">Condomínio</Label>
-                            <Input id="property-condominium-fee" placeholder="R$ 800,00" />
+                            <Label htmlFor="condominiumFee">Condomínio</Label>
+                            <Input
+                                id="condominiumFee"
+                                placeholder="R$ 800,00"
+                                {...register("condominiumFee")}
+                                className={errors.condominiumFee ? "border-red-500" : ""}
+                            />
+                            {errors.condominiumFee && <p className="text-sm text-red-500">{errors.condominiumFee.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="property-iptu">IPTU</Label>
-                            <Input id="property-iptu" placeholder="R$ 1.200,00" />
+                            <Label htmlFor="iptu">IPTU</Label>
+                            <Input
+                                id="iptu"
+                                placeholder="R$ 1.200,00"
+                                {...register("iptu")}
+                                className={errors.iptu ? "border-red-500" : ""}
+                            />
+                            {errors.iptu && <p className="text-sm text-red-500">{errors.iptu.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="property-latitude">Latitude</Label>
-                            <Input id="property-latitude" type="number" step="any" placeholder="-27.5794" />
+                            <Label htmlFor="latitude">Latitude</Label>
+                            <Input
+                                id="latitude"
+                                type="number"
+                                step="any"
+                                placeholder="-27.5794"
+                                {...register("latitude")}
+                                className={errors.latitude ? "border-red-500" : ""}
+                            />
+                            {errors.latitude && <p className="text-sm text-red-500">{errors.latitude.message}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="property-longitude">Longitude</Label>
-                            <Input id="property-longitude" type="number" step="any" placeholder="-48.5499" />
+                            <Label htmlFor="longitude">Longitude</Label>
+                            <Input
+                                id="longitude"
+                                type="number"
+                                step="any"
+                                placeholder="-48.5499"
+                                {...register("longitude")}
+                                className={errors.longitude ? "border-red-500" : ""}
+                            />
+                            {errors.longitude && <p className="text-sm text-red-500">{errors.longitude.message}</p>}
                         </div>
                         <div className="space-y-2 md:col-span-2">
                             <Label>Destaque</Label>
@@ -213,36 +357,26 @@ export default function CreateProperties() {
                     </CardHeader>
                     <CardContent className="grid gap-4 md:grid-cols-2">
                         <RelationSelect
-                            name="property-owner-id"
-                            label="Proprietário"
+                            name="ownerId"
+                            label="Proprietário *"
                             placeholder="Selecione um proprietário"
                             searchPlaceholder="Buscar proprietário por nome, e-mail ou ID"
                             options={ownerOptions}
                         />
                         <RelationSelect
-                            name="property-realtor-id"
+                            name="realtorId"
                             label="Corretor"
                             placeholder="Selecione um corretor"
                             searchPlaceholder="Buscar corretor por nome, e-mail ou ID"
                             options={realtorOptions}
                         />
-                        <div className="space-y-2">
-                            <Label htmlFor="property-tour">Tour virtual</Label>
-                            <Input id="property-tour" placeholder="https://..." />
-                        </div>
-                        <div className="space-y-2 md:col-span-2">
-                            <Label htmlFor="property-images">Imagens</Label>
-                            <Textarea id="property-images" placeholder="Uma URL por linha." />
-                        </div>
-                        <div className="space-y-2 md:col-span-2">
-                            <Label htmlFor="property-videos">Vídeos</Label>
-                            <Textarea id="property-videos" placeholder="Uma URL por linha." />
-                        </div>
                     </CardContent>
                 </Card>
 
                 <div className="flex justify-end gap-3">
-                    <Button type="submit">Salvar imóvel</Button>
+                    <Button type="submit" disabled={isSubmitting}>
+                        {isSubmitting ? "Salvando..." : "Salvar imóvel"}
+                    </Button>
                 </div>
             </form>
         </div>
