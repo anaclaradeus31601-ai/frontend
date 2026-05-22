@@ -4,11 +4,38 @@ import { Input } from "#components/ui/input";
 import { Label } from "#components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "#components/ui/select";
 import { Textarea } from "#components/ui/textarea";
-import { Upload } from "lucide-react";
+import { ChevronLeft, Upload } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { RelationSelect } from "#components/admin/relation-select";
+import { useOwners, useRealtors } from "../../../hooks";
+import { PropertyStatus, PropertyType, TransactionType } from "../../../types/database";
+import { createZodFormHandler } from "../../../lib/zod-form";
+import { createPropertySchema } from "../../../validations/admin-forms";
 
 export default function CreateProperties() {
+    const navigate = useNavigate();
+    const { data: owners } = useOwners();
+    const { data: realtors } = useRealtors();
+
+    const ownerOptions = owners.map((owner) => ({
+        id: owner.id,
+        label: owner.name,
+        description: owner.email,
+    }));
+
+    const realtorOptions = realtors.map((realtor) => ({
+        id: realtor.id,
+        label: realtor.name,
+        description: realtor.email,
+    }));
+
     return (
         <div className="p-6 space-y-6">
+            <Button type="button" variant="ghost" className="w-fit px-0" onClick={() => navigate(-1)}>
+                <ChevronLeft />
+                Voltar
+            </Button>
+
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div className="space-y-1">
                     <h2 className="text-2xl font-bold tracking-tight">Criar Imóvel</h2>
@@ -20,7 +47,7 @@ export default function CreateProperties() {
                 </Button>
             </div>
 
-            <form className="space-y-6" onSubmit={(event) => event.preventDefault()}>
+            <form className="space-y-6" onSubmit={createZodFormHandler(createPropertySchema)}>
                 <Card>
                     <CardHeader>
                         <CardTitle>Informações principais</CardTitle>
@@ -38,9 +65,8 @@ export default function CreateProperties() {
                                     <SelectValue placeholder="Selecione" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="rent">Aluguel</SelectItem>
-                                    <SelectItem value="sale">Venda</SelectItem>
-                                    <SelectItem value="both">Ambos</SelectItem>
+                                    <SelectItem value={TransactionType.RENT}>Aluguel</SelectItem>
+                                    <SelectItem value={TransactionType.SALE}>Venda</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -51,9 +77,23 @@ export default function CreateProperties() {
                                     <SelectValue placeholder="Selecione" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="residential">Residencial</SelectItem>
-                                    <SelectItem value="commercial">Comercial</SelectItem>
-                                    <SelectItem value="land">Terreno</SelectItem>
+                                    <SelectItem value={PropertyType.RESIDENTIAL}>Residencial</SelectItem>
+                                    <SelectItem value={PropertyType.COMMERCIAL}>Comercial</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <Label>Status</Label>
+                            <Select defaultValue={PropertyStatus.AVAILABLE}>
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Selecione" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value={PropertyStatus.AVAILABLE}>Disponível</SelectItem>
+                                    <SelectItem value={PropertyStatus.RENTED}>Alugado</SelectItem>
+                                    <SelectItem value={PropertyStatus.SOLD}>Vendido</SelectItem>
+                                    <SelectItem value={PropertyStatus.PENDING}>Pendente</SelectItem>
+                                    <SelectItem value={PropertyStatus.MAINTENANCE}>Manutenção</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -122,6 +162,47 @@ export default function CreateProperties() {
                             <Label htmlFor="property-zip-code">CEP</Label>
                             <Input id="property-zip-code" placeholder="00000-000" />
                         </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="property-country">País</Label>
+                            <Input id="property-country" defaultValue="Brasil" />
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Valores adicionais e metadados</CardTitle>
+                        <CardDescription>Preencha taxas, localização e destaque do anúncio.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="grid gap-4 md:grid-cols-2">
+                        <div className="space-y-2">
+                            <Label htmlFor="property-condominium-fee">Condomínio</Label>
+                            <Input id="property-condominium-fee" placeholder="R$ 800,00" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="property-iptu">IPTU</Label>
+                            <Input id="property-iptu" placeholder="R$ 1.200,00" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="property-latitude">Latitude</Label>
+                            <Input id="property-latitude" type="number" step="any" placeholder="-27.5794" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="property-longitude">Longitude</Label>
+                            <Input id="property-longitude" type="number" step="any" placeholder="-48.5499" />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <Label>Destaque</Label>
+                            <Select defaultValue="false">
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Selecione" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="true">Sim</SelectItem>
+                                    <SelectItem value="false">Não</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </CardContent>
                 </Card>
 
@@ -131,31 +212,36 @@ export default function CreateProperties() {
                         <CardDescription>Associe o responsável pelo imóvel e inclua links de apoio.</CardDescription>
                     </CardHeader>
                     <CardContent className="grid gap-4 md:grid-cols-2">
-                        <div className="space-y-2">
-                            <Label htmlFor="property-owner">ID do proprietário</Label>
-                            <Input id="property-owner" type="number" min="1" placeholder="1" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="property-realtor">ID do corretor</Label>
-                            <Input id="property-realtor" type="number" min="1" placeholder="1" />
-                        </div>
+                        <RelationSelect
+                            name="property-owner-id"
+                            label="Proprietário"
+                            placeholder="Selecione um proprietário"
+                            searchPlaceholder="Buscar proprietário por nome, e-mail ou ID"
+                            options={ownerOptions}
+                        />
+                        <RelationSelect
+                            name="property-realtor-id"
+                            label="Corretor"
+                            placeholder="Selecione um corretor"
+                            searchPlaceholder="Buscar corretor por nome, e-mail ou ID"
+                            options={realtorOptions}
+                        />
                         <div className="space-y-2">
                             <Label htmlFor="property-tour">Tour virtual</Label>
                             <Input id="property-tour" placeholder="https://..." />
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="property-video">Vídeo</Label>
-                            <Input id="property-video" placeholder="https://youtube.com/..." />
-                        </div>
                         <div className="space-y-2 md:col-span-2">
                             <Label htmlFor="property-images">Imagens</Label>
-                            <Input id="property-images" type="file" multiple />
+                            <Textarea id="property-images" placeholder="Uma URL por linha." />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <Label htmlFor="property-videos">Vídeos</Label>
+                            <Textarea id="property-videos" placeholder="Uma URL por linha." />
                         </div>
                     </CardContent>
                 </Card>
 
                 <div className="flex justify-end gap-3">
-                    <Button type="button" variant="outline">Cancelar</Button>
                     <Button type="submit">Salvar imóvel</Button>
                 </div>
             </form>

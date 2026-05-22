@@ -3,25 +3,36 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "#comp
 import { Input } from "#components/ui/input";
 import { Label } from "#components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "#components/ui/select";
-import { Textarea } from "#components/ui/textarea";
+import { ChevronLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { UserRole } from "../../../types/database";
+import { createZodFormHandler } from "../../../lib/zod-form";
+import { createRealtorSchema } from "../../../validations/admin-forms";
 
 export default function CreateRealtors() {
+    const navigate = useNavigate();
+
     return (
         <div className="p-6 space-y-6">
+            <Button type="button" variant="ghost" className="w-fit px-0" onClick={() => navigate(-1)}>
+                <ChevronLeft />
+                Voltar
+            </Button>
+
             <div className="space-y-1">
                 <h2 className="text-2xl font-bold tracking-tight">Criar Corretor</h2>
-                <p className="text-sm text-muted-foreground">Cadastre um corretor com dados profissionais, contato e área de atuação.</p>
+                <p className="text-sm text-muted-foreground">Cadastre um usuário com role de corretor.</p>
             </div>
 
-            <form className="space-y-6" onSubmit={(event) => event.preventDefault()}>
+            <form className="space-y-6" onSubmit={createZodFormHandler(createRealtorSchema)}>
                 <Card>
                     <CardHeader>
                         <CardTitle>Perfil profissional</CardTitle>
                         <CardDescription>Dados obrigatórios para identificação do corretor no sistema.</CardDescription>
                     </CardHeader>
                     <CardContent className="grid gap-4 md:grid-cols-2">
-                        <div className="space-y-2 md:col-span-2">
-                            <Label htmlFor="realtor-name">Nome completo</Label>
+                        <div className="space-y-2">
+                            <Label htmlFor="realtor-name">Nome</Label>
                             <Input id="realtor-name" placeholder="Ana Costa" />
                         </div>
                         <div className="space-y-2">
@@ -33,40 +44,42 @@ export default function CreateRealtors() {
                             <Input id="realtor-phone" placeholder="(11) 99999-9999" />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="realtor-cpf">CPF</Label>
-                            <Input id="realtor-cpf" placeholder="000.000.000-00" />
+                            <Label htmlFor="realtor-password">Senha</Label>
+                            <Input id="realtor-password" type="password" placeholder="Senha inicial" />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="realtor-creci">CRECI</Label>
-                            <Input id="realtor-creci" placeholder="123456-F" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Especialidade</Label>
-                            <Select>
+                            <Label>Role</Label>
+                            <Select defaultValue={UserRole.REALTOR}>
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Selecione" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="rent">Locação</SelectItem>
-                                    <SelectItem value="sale">Venda</SelectItem>
-                                    <SelectItem value="high-standard">Alto padrão</SelectItem>
-                                    <SelectItem value="commercial">Comercial</SelectItem>
+                                    <SelectItem value={UserRole.REALTOR}>Corretor</SelectItem>
+                                    <SelectItem value={UserRole.CLIENT}>Cliente</SelectItem>
+                                    <SelectItem value={UserRole.ADMIN}>Administrador</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="realtor-photo">Foto de perfil</Label>
-                            <Input id="realtor-photo" type="file" />
+                            <Label>E-mail verificado</Label>
+                            <Select defaultValue="false">
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Selecione" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="true">Sim</SelectItem>
+                                    <SelectItem value="false">Não</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                         <div className="space-y-2 md:col-span-2">
-                            <Label htmlFor="realtor-bio">Bio</Label>
-                            <Textarea id="realtor-bio" placeholder="Resumo profissional, região de atuação e diferenciais no atendimento." />
+                            <Label htmlFor="realtor-avatar">Avatar</Label>
+                            <Input id="realtor-avatar" placeholder="https://..." />
                         </div>
                     </CardContent>
                 </Card>
 
                 <div className="flex justify-end gap-3">
-                    <Button type="button" variant="outline">Cancelar</Button>
                     <Button type="submit">Salvar corretor</Button>
                 </div>
             </form>

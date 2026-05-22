@@ -3,6 +3,7 @@ import { Button } from "#components/ui/button";
 import { Input } from "#components/ui/input";
 import { Separator } from "#components/ui/separator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "#components/ui/table";
+import { Eye, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -87,6 +88,7 @@ export default function IndexPayments() {
                 <Separator className="mt-2"></Separator>
                 <div className="flex gap-4 mt-4 mb-4">
                     <Input className="w-60" placeholder="Buscar" onChange={(e) => setSearch(e.target.value)}></Input>
+                    <Button onClick={() => navigate("/admin/payments/create")}>Criar Pagamento</Button>
                     <Button className="ml-auto">Total R$: {payments.reduce((total, payment) => total + payment.amount, 0)}</Button>
                 </div>
                 <div className="border rounded-2xl">
@@ -98,19 +100,31 @@ export default function IndexPayments() {
                                 <TableHead className="text-center">Data de Vencimento</TableHead>
                                 <TableHead className="text-center">Data de Pagamento</TableHead>
                                 <TableHead className="text-center">Status</TableHead>
+                                <TableHead className="text-center">Ações</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {payments.map(payment => (
-                                <TableRow key={payment.id} onClick={() => navigate(`/admin/payments/${payment.id}`)}>
+                                <TableRow key={payment.id}>
                                     <TableCell className="text-center">{payment.nameClient}</TableCell>
                                     <TableCell className="text-center">{payment.amount}</TableCell>
                                     <TableCell className="text-center">{payment.dueDate}</TableCell>
                                     <TableCell className="text-center">{payment.paidDate}</TableCell>
                                     <TableCell className="text-center"><Badge className={` text-h ${payment.status === "COMPLETED" ? "bg-green-500/50" : payment.status === "REFUNDED" ? "bg-red-500/50" : payment.status === "PENDING" ? "bg-yellow-500/50" : "bg-blue-500/50"}`}>{payment.status}</Badge></TableCell>
+                                    <TableCell className="flex justify-center gap-2">
+                                        <Button size="icon" variant="outline" onClick={() => navigate(`/admin/payments/${payment.id}`)}>
+                                            <Eye className="h-4 w-4" />
+                                        </Button>
+                                        <Button size="icon" variant="outline" onClick={() => navigate(`/admin/payments/edit/${payment.id}`)}>
+                                            <Pencil className="h-4 w-4" />
+                                        </Button>
+                                        <Button size="icon" variant="destructive">
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </TableCell>
                                 </TableRow>
                             ))}
-                            {payments.length === 0 && <TableRow><TableCell className="text-center py-4" colSpan={5}>Nenhum pagamento encontrado.</TableCell></TableRow>}
+                            {payments.length === 0 && <TableRow><TableCell className="text-center py-4" colSpan={6}>Nenhum pagamento encontrado.</TableCell></TableRow>}
                         </TableBody>
                     </Table>
                 </div>

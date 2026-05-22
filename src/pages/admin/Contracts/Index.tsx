@@ -1,10 +1,9 @@
 import { Badge } from "#components/ui/badge";
 import { Button } from "#components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "#components/ui/dialog";
 import { Input } from "#components/ui/input";
 import { Separator } from "#components/ui/separator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "#components/ui/table";
-import {  Search } from "lucide-react";
+import { Eye, Pencil, Search, Trash2 } from "lucide-react";
 import {  useState } from "react";
 // import CreateContracts from "./Create";
 import { useNavigate } from "react-router-dom";
@@ -145,7 +144,7 @@ export default function IndexContracts() {
                             <Search className="h-4 w-4" />
                         </Button>
                     </div>
-                    <Button className="ml-auto">Novo Contrato</Button>
+                    <Button className="ml-auto" onClick={() => navigate("/admin/contracts/create")}>Novo Contrato</Button>
                 </div>
 
                 <div className="border rounded-2xl">
@@ -159,11 +158,12 @@ export default function IndexContracts() {
                                 <TableHead className="text-center">Data de Vencimento</TableHead>
                                 <TableHead className="text-center">Valor</TableHead>
                                 <TableHead className="text-center">Status</TableHead>
+                                <TableHead className="text-center">Ações</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             { contracts.length > 0 && contracts.map((contract) => (
-                                <TableRow onClick={() => openContract(contract.id)} key={contract.id}>
+                                <TableRow key={contract.id}>
                                     <TableCell className="text-center">
                                         {contract.client}
                                     </TableCell>
@@ -193,10 +193,21 @@ export default function IndexContracts() {
                                     <TableCell className="text-center">
                                         <Badge className={contract.status === "ACTIVE" ? "bg-green-500" : contract.status === "EXPIRING" ? "bg-yellow-500" : contract.status === "EXPIRED" ? "bg-red-500" : contract.status === "CANCELLED" ? "bg-gray-500" : ""}>{contract.status}</Badge>
                                     </TableCell>
+                                    <TableCell className="flex justify-center gap-2">
+                                        <Button size="icon" variant="outline" onClick={() => openContract(contract.id)}>
+                                            <Eye className="h-4 w-4" />
+                                        </Button>
+                                        <Button size="icon" variant="outline" onClick={() => navigate(`/admin/contracts/edit/${contract.id}`)}>
+                                            <Pencil className="h-4 w-4" />
+                                        </Button>
+                                        <Button size="icon" variant="destructive">
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </TableCell>
                                 </TableRow>
                             ))}
 
-                            {contracts.length === 0 && <TableRow><TableCell className="text-center p-4" colSpan={6}>Nenhum contrato encontrado</TableCell></TableRow>}
+                            {contracts.length === 0 && <TableRow><TableCell className="text-center p-4" colSpan={7}>Nenhum contrato encontrado</TableCell></TableRow>}
                         </TableBody>
                     </Table>
                 </div>

@@ -9,6 +9,7 @@ import {
   DollarSign,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { previewPropertySchema } from "../../validations/client-forms";
 
 export default function CreateProperty() {
   const [form, setForm] = useState({
@@ -36,6 +37,13 @@ export default function CreateProperty() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    const result = previewPropertySchema.safeParse(form);
+
+    if (!result.success) {
+      window.alert(result.error.issues[0]?.message ?? "Revise os campos do formulário.");
+      return;
+    }
 
     console.log(form);
     navigate("/show-property");

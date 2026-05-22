@@ -37,6 +37,13 @@ import DefaultLayout from "./components/layout/DefaultLayout";
 import IndexProperties from "./pages/admin/Properties/Index";
 import IndexRealtors from "./pages/admin/Realtors/Index";
 import IndexPayments from "./pages/admin/Payments/Index";
+import RealtorLayout from "./components/layout/RealtorLayout";
+import RealtorHome from "./pages/realtor/Home";
+import RealtorProperties from "./pages/realtor/Properties";
+import RealtorVisits from "./pages/realtor/Visits";
+import RealtorContracts from "./pages/realtor/Contracts";
+import RealtorProfile from "./pages/realtor/Profile";
+import RealtorSettings from "./pages/realtor/Settings";
 
 export default function App() {
   return (
@@ -110,6 +117,17 @@ export default function App() {
           {/* Analytics */}
           <Route path="analytics" element={<Analyitcs />} />
 
+        </Route>
+
+        {/* Realtor Routes */}
+        <Route path="/realtor" element={<RealtorLayout />}>
+          <Route index element={<RealtorHome />} />
+          <Route path="properties" element={<RealtorProperties />} />
+          <Route path="visits" element={<RealtorVisits />} />
+          <Route path="contracts" element={<RealtorContracts />} />
+          <Route path="profile" element={<RealtorProfile />} />
+          <Route path="settings" element={<RealtorSettings />} />
+          <Route path="notifications" element={<RealtorSettings />} />
         </Route>
 
       </Routes>

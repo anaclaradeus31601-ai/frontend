@@ -30,6 +30,14 @@ import Analyitcs from "../pages/admin/Analytics/Analytics"
 import AdminLayout from "#components/layout/AdminLayout"
 import IndexProperties from "../pages/admin/Properties/Index"
 import IndexRealtors from "../pages/admin/Realtors/Index"
+import IndexPayments from "../pages/admin/Payments/Index"
+import RealtorLayout from "#components/layout/RealtorLayout"
+import RealtorHome from "../pages/realtor/Home"
+import RealtorProperties from "../pages/realtor/Properties"
+import RealtorVisits from "../pages/realtor/Visits"
+import RealtorContracts from "../pages/realtor/Contracts"
+import RealtorProfile from "../pages/realtor/Profile"
+import RealtorSettings from "../pages/realtor/Settings"
 
 
 export const AdminRoutes: RouteObject[] = [
@@ -110,6 +118,10 @@ export const AdminRoutes: RouteObject[] = [
     },
     //payments
     {
+      path: "payments",
+      element: <IndexPayments />,
+    },
+    {
       path: "payments/:id",
       element: <ShowPayments />,
     },
@@ -172,3 +184,40 @@ export const AdminRoutes: RouteObject[] = [
     
   ]
 },]
+
+export const RealtorRoutes: RouteObject[] = [
+  {
+    path: "/realtor",
+    element: <RealtorLayout />,
+    children: [
+      {
+        index: true,
+        element: <RealtorHome />,
+      },
+      {
+        path: "properties",
+        element: <RealtorProperties />,
+      },
+      {
+        path: "visits",
+        element: <RealtorVisits />,
+      },
+      {
+        path: "contracts",
+        element: <RealtorContracts />,
+      },
+      {
+        path: "profile",
+        element: <RealtorProfile />,
+      },
+      {
+        path: "settings",
+        element: <RealtorSettings />,
+      },
+      {
+        path: "notifications",
+        element: <RealtorSettings />,
+      },
+    ],
+  },
+]

@@ -5,11 +5,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "#
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import { importProperties } from "../../../scripts/importProperties";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 
 export default function IndexProperties() {
 
     const [open, setOpen] = useState(false);
+    const navigate = useNavigate();
 
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -136,19 +138,13 @@ export default function IndexProperties() {
         }
     };
 
-    if (searchTerm) {
-        const searchImoveis = imoveis.filter((imovel) => [
+    const filteredImoveis = searchTerm
+        ? imoveis.filter((imovel) =>
             imovel.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            imovel.garages.toString().includes(searchTerm.toLowerCase()) ||
+            imovel.garages?.toString().includes(searchTerm.toLowerCase()) ||
             imovel.bedrooms.toString().includes(searchTerm.toLowerCase())
-
-        ]);
-
-        setImoveis((prev) => [
-            ...prev,
-            ...searchImoveis
-        ]);
-    }
+        )
+        : imoveis;
 
 
 
@@ -156,8 +152,9 @@ export default function IndexProperties() {
     return (
         <div className="p-6 space-y-4">
             <h2 className="text-2xl font-bold tracking-tight">Imóveis</h2>
-            <div className="w-full mb-4 flex justify-end">
+            <div className="w-full mb-4 flex justify-end gap-3">
                 <Input className="w-60 mr-auto" placeholder="Pesquisar" onChange={(e) => setSearchTerm(e.target.value)} />
+                <Button onClick={() => navigate("/admin/properties/create")}>Criar Imóvel</Button>
                 <Dialog  open={open} onOpenChange={setOpen}>
 
                     <DialogTrigger asChild>
@@ -219,7 +216,7 @@ export default function IndexProperties() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {imoveis.map((imovel) => (
+                        {filteredImoveis.map((imovel) => (
                             <TableRow key={imovel.id}>
                                 <TableCell className="text-center">{imovel.title}</TableCell>
                                 <TableCell className="text-center">{imovel.rentPrice}</TableCell>
@@ -230,8 +227,8 @@ export default function IndexProperties() {
                                 <TableCell className="text-center">{imovel.area}</TableCell>
                                 <TableCell className="text-center">{imovel.images.length}</TableCell>
                                 <TableCell className="items-center justify-center flex gap-2">
-                                    <Button variant="outline"><Eye></Eye></Button>
-                                    <Button variant="outline"><Pencil></Pencil></Button>
+                                    <Button variant="outline" onClick={() => navigate(`/admin/properties/${imovel.id}`)}><Eye></Eye></Button>
+                                    <Button variant="outline" onClick={() => navigate(`/admin/properties/edit/${imovel.id}`)}><Pencil></Pencil></Button>
                                     <Button variant="destructive"><Trash2></Trash2></Button>
                                 </TableCell>
                             </TableRow>

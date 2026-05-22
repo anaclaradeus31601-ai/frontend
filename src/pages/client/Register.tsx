@@ -7,6 +7,7 @@ import {
   User,
   Phone,
 } from "lucide-react";
+import { registerSchema } from "../../validations/client-forms";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -20,8 +21,16 @@ export default function Register() {
   function handleRegister(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
-      alert("As senhas não coincidem");
+    const result = registerSchema.safeParse({
+      name,
+      email,
+      phone,
+      password,
+      confirmPassword,
+    });
+
+    if (!result.success) {
+      window.alert(result.error.issues[0]?.message ?? "Revise os campos do formulário.");
       return;
     }
 

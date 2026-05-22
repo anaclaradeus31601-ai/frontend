@@ -3,12 +3,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "#
 import { Button } from "#components/ui/button";
 import { Input } from '#components/ui/input';
 import { useState } from 'react';
+import { useNavigate } from "react-router-dom";
 // import { useEffect, useState } from "react";
-// import { useNavigate } from "react-router-dom";
 export default function IndexOwners() {
 
 
     const [searchTerm, setSearchTerm] = useState("");
+    const navigate = useNavigate();
 
     let owners = [
             {
@@ -56,6 +57,7 @@ export default function IndexOwners() {
             <div className="flex gap-4">
                 <Input onChange={(e) => setSearchTerm(e.target.value)} type="text" className="w-60" placeholder="Buscar proprietário..."></Input>
                 <Button><Search></Search></Button>
+                <Button className="ml-auto" onClick={() => navigate("/admin/owners/create")}>Criar Proprietário</Button>
             </div>
             <div className="border rounded-2xl">
                 <Table>
@@ -71,18 +73,18 @@ export default function IndexOwners() {
                     </TableHeader>
                     <TableBody>
                         {owners.map((owner) => (
-                            <TableRow>
+                            <TableRow key={owner.id}>
                                 <TableCell className="font-medium text-center">{owner.id}</TableCell>
                                 <TableCell className="font-medium text-center">{owner.name}</TableCell>
                                 <TableCell className="font-medium text-center">{owner.phone}</TableCell>
                                 <TableCell className="font-medium text-center">{owner.email}</TableCell>
                                 <TableCell className="font-medium text-center">{owner.cpf}</TableCell>
                                 <TableCell className="flex justify-center gap-2">
-                                    <Button size="icon" variant="outline">
+                                    <Button size="icon" variant="outline" onClick={() => navigate(`/admin/owners/${owner.id}`)}>
                                         <Eye className="h-4 w-4" />
                                     </Button>
 
-                                    <Button size="icon" variant="outline">
+                                    <Button size="icon" variant="outline" onClick={() => navigate(`/admin/owners/edit/${owner.id}`)}>
                                         <Pencil className="h-4 w-4" />
                                     </Button>
 

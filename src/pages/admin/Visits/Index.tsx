@@ -3,10 +3,12 @@ import { Input } from "#components/ui/input";
 import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from "#components/ui/table";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function IndexVisits(){
 
     const [search, setSearch] = useState('');
+    const navigate = useNavigate();
 
     let visits = [
         {
@@ -63,6 +65,9 @@ export default function IndexVisits(){
                 <Button>
                     Buscar
                 </Button>
+                <Button className="ml-auto" onClick={() => navigate("/admin/visits/create")}>
+                    Criar Visita
+                </Button>
             </div>
             <div className="overflow-x-auto border rounded-2xl">
                 <Table>
@@ -85,10 +90,10 @@ export default function IndexVisits(){
                                 <TableCell className="text-center">{visit.time}</TableCell>
                                 <TableCell className="text-center">{visit.realtor}</TableCell>
                                 <TableCell className="text-center">
-                                    <Button variant="outline" size="sm" className="mr-2">
+                                    <Button variant="outline" size="sm" className="mr-2" onClick={() => navigate(`/admin/visits/${visit.id}`)}>
                                         <Eye></Eye>
                                     </Button>
-                                    <Button variant="outline" size="sm" className="mr-2">
+                                    <Button variant="outline" size="sm" className="mr-2" onClick={() => navigate(`/admin/visits/edit/${visit.id}`)}>
                                         <Pencil></Pencil>
                                     </Button>
                                     <Button variant="destructive" size="sm">

@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Building2, Mail, Lock } from "lucide-react";
+import { loginSchema } from "../../validations/client-forms";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -10,6 +11,13 @@ export default function Login() {
 
   function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
+    const result = loginSchema.safeParse({ email, senha });
+
+    if (!result.success) {
+      window.alert(result.error.issues[0]?.message ?? "Revise os campos do formulário.");
+      return;
+    }
 
     console.log(email, senha);
 

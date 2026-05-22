@@ -7,6 +7,7 @@ import {
   FileText,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { ownerLandingSchema } from "../../validations/client-forms";
 
 export default function CreateOwner() {
   const [form, setForm] = useState({
@@ -30,6 +31,14 @@ export default function CreateOwner() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    const result = ownerLandingSchema.safeParse(form);
+
+    if (!result.success) {
+      window.alert(result.error.issues[0]?.message ?? "Revise os campos do formulário.");
+      return;
+    }
+
     console.log(form);
     navigate("/preview");
   }
