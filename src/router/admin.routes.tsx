@@ -1,5 +1,4 @@
 import type { RouteObject } from "react-router-dom"
-import AdminLayout from "../layouts/AdminLayout"
 import CreateClients from "../pages/admin/Clients/Create"
 import EditClients from "../pages/admin/Clients/Edit"
 import ShowClients from "../pages/admin/Clients/Show"
@@ -28,6 +27,9 @@ import IndexOwners from "../pages/admin/Owners/Index"
 import IndexContracts from "../pages/admin/Contracts/Index"
 import IndexVisits from "../pages/admin/Visits/Index"
 import Analyitcs from "../pages/admin/Analytics/Analytics"
+import AdminLayout from "#components/layout/AdminLayout"
+import IndexProperties from "../pages/admin/Properties/Index"
+import IndexRealtors from "../pages/admin/Realtors/Index"
 
 
 export const AdminRoutes: RouteObject[] = [
@@ -74,6 +76,10 @@ export const AdminRoutes: RouteObject[] = [
       element: <EditOwners />,
     },
     // properties
+    {
+      path: "properties",
+      element: <IndexProperties />,
+    },
     {
       path: "properties/:id",
       element: <ShowProperties />,
@@ -133,6 +139,10 @@ export const AdminRoutes: RouteObject[] = [
       element: <EditContracts />,
     },
     // realtors
+    {
+      path: "realtors",
+      element: <IndexRealtors/>,
+    },
     {
       path: "realtors/:id",
       element: <ShowRealtors />,

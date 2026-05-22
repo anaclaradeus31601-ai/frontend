@@ -53,44 +53,44 @@ export default function Analytics() {
     }, []);
 
     const realtors = [
-        { name: "Realtor 1", sales: 20 },
-        { name: "Realtor 2", sales: 15 },
-        { name: "Realtor 3", sales: 10 },
-        { name: "Realtor 4", sales: 8 },
-        { name: "Realtor 5", sales: 5 },
-        { name: "Realtor 6", sales: 3 },
-        { name: "Realtor 7", sales: 2 },
-        { name: "Realtor 8", sales: 1 },
+        { name: "Corretor 1", sales: 20 },
+        { name: "Corretor 2", sales: 15 },
+        { name: "Corretor 3", sales: 10 },
+        { name: "Corretor 4", sales: 8 },
+        { name: "Corretor 5", sales: 5 },
+        { name: "Corretor 6", sales: 3 },
+        { name: "Corretor 7", sales: 2 },
+        { name: "Corretor 8", sales: 1 },
     ]
 
 
     return (
         <div className="p-6 space-y-4 h-full">
-            <h1 className="text-2xl font-bold mb-4">Analytics</h1>
+            <h1 className="text-2xl font-bold mb-4">Análises</h1>
             <div className="flex flex-col gap-4 mt-6 md:flex-row lg:flex-row ">
                 {/* Analytics cards */}
                 <div className="lg:w-4/6 md:w-4/6 w-full">
                     <div className="flex flex-col md:flex-row lg:flex-row justify-between gap-4 ">
                         <div className="bg-card w-full rounded-lg shadow px-4 py-2 h-22 mb-4">
-                            <p className="text-[10pt] font-heading items-center flex gap-2"> <PersonStandingIcon size={14}></PersonStandingIcon> Visitors</p>
+                            <p className="text-[10pt] font-heading items-center flex gap-2"> <PersonStandingIcon size={14}></PersonStandingIcon>Corretores</p>
                             <span className="text-2xl font-bold flex justify-between">1,234
                                 <Button className="bg-green-200 text-green-600 hover:bg-green-200"><ArrowBigUp /></Button>
                             </span>
-                            <p className="text-green-500  text-[8pt]">+ 2.5% <span className="text-gray-600"> more than last month</span></p>
+                            <p className="text-green-500  text-[8pt]">+ 2.5% <span className="text-gray-600">mais do que o ultimo mês</span></p>
                         </div>
                         <div className="bg-card w-full rounded-lg shadow px-4 py-2 h-22 mb-4">
-                            <p className="text-[10pt] font-heading items-center flex gap-2"> <Wallet size={14}></Wallet> Visitors</p>
+                            <p className="text-[10pt] font-heading items-center flex gap-2"> <Wallet size={14}></Wallet>Visitantes</p>
                             <span className="text-2xl font-bold flex justify-between">1,234
                                 <Button className="bg-green-200 text-green-600 hover:bg-green-200"><ArrowBigUp /></Button>
                             </span>
-                            <p className="text-green-500  text-[8pt]">+ 2.5% <span className="text-gray-600"> more than last month</span></p>
+                            <p className="text-green-500  text-[8pt]">+ 2.5% <span className="text-gray-600">mais do que o ultimo mês</span></p>
                         </div>
                         <div className="bg-card w-full rounded-lg shadow px-4 py-2 h-22 mb-4">
-                            <p className="text-[10pt] font-heading items-center flex gap-2"> <Wallet size={14}></Wallet>Sales</p>
+                            <p className="text-[10pt] font-heading items-center flex gap-2"> <Wallet size={14}></Wallet>Vendas</p>
                             <span className="text-2xl font-bold flex justify-between">1,234
                                 <Button className="bg-red-200 text-red-600 hover:bg-red-200"><ArrowBigDown /></Button>
                             </span>
-                            <p className="text-red-500  text-[8pt]">+ 2.5% <span className="text-gray-600"> more than last month</span></p>
+                            <p className="text-red-500  text-[8pt]">+ 2.5% <span className="text-gray-600">mais do que o ultimo mês</span></p>
                         </div>
 
 
@@ -101,12 +101,12 @@ export default function Analytics() {
                         <div className="bg-card rounded-xl w-full h-90 shadow p-4 border border-border">
                             <div className="flex items-center justify-between mb-4">
                                 <div>
-                                    <p className="text-sm text-gray-500">Monthly Revenue</p>
+                                    <p className="text-sm text-gray-500">Receita do mês</p>
                                     <h2 className="text-2xl font-bold">R$ 84.2K</h2>
                                 </div>
 
                                 <Button variant="outline" className="rounded-full">
-                                    This Year
+                                    Este ano
                                 </Button>
                             </div>
 
@@ -114,10 +114,10 @@ export default function Analytics() {
                                 <AreaChart
                                     data={[
                                         { month: "Jan", value: 12000 },
-                                        { month: "Feb", value: 18000 },
+                                        { month: "Fev", value: 18000 },
                                         { month: "Mar", value: 14000 },
-                                        { month: "Apr", value: 24000 },
-                                        { month: "May", value: 30000 },
+                                        { month: "Abr", value: 24000 },
+                                        { month: "Mai", value: 30000 },
                                         { month: "Jun", value: 26000 },
                                         { month: "Jul", value: 38000 },
                                     ]}
@@ -152,22 +152,22 @@ export default function Analytics() {
                         <div className="bg-card rounded-xl w-full h-90 shadow p-4 border border-border">
                             <div className="flex items-center justify-between mb-4">
                                 <div>
-                                    <p className="text-sm text-gray-500">Properties Status</p>
+                                    <p className="text-sm text-gray-500">Propriedades</p>
                                     <h2 className="text-2xl font-bold">248</h2>
                                 </div>
 
                                 <Button variant="outline" className="rounded-full">
-                                    Updated
+                                        Atualizado
                                 </Button>
                             </div>
 
                             <ResponsiveContainer width="100%" height="80%">
                                 <BarChart
                                     data={[
-                                        { name: "Sold", value: 42 },
-                                        { name: "Rent", value: 87 },
-                                        { name: "Pending", value: 21 },
-                                        { name: "New", value: 58 },
+                                        { name: "Vendidos", value: 42 },
+                                        { name: "Alugados", value: 87 },
+                                        { name: "Pendentes", value: 21 },
+                                        { name: "Novos", value: 58 },
                                     ]}
                                 >
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -189,7 +189,7 @@ export default function Analytics() {
                 </div>
                 <div className="lg:w-2/6 md:w-1/2 w-full bg-card  shadow rounded-md ">
                     <div className=" rounded-lg p-4 flex flex-col gap-4 ">
-                        <h3 className="text-lg text-center font-bold">Top Realtors</h3>
+                        <h3 className="text-lg text-center font-bold">Melhores Corretores do ano</h3>
                         <div ref={sliderRef} className="flex flex-col gap-2 h-90 cursor-grab active:cursor-grabbing overflow-x-auto select-none  scrollbar-none  ">
                             {realtors.map((realtor, index) => (
                                 <div key={index} className="flex justify-between shadow p-2 gap-3 items-center">

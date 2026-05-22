@@ -1,23 +1,17 @@
 
-import fundo from "../../../public/imagens/casafundodia.png"
+import fundo from "../../../src/assets/casafundodia.png"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "#components/ui/select";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "#components/ui/input-group";
 import { MapPin, Search } from "lucide-react";
-import PropertyCard from "#components/property/property-card";
 import PropertyGrid from "#components/property/property-grid";
 
 export default function Home() {
-
-
-
   return (
     <div className="relative">
       <div className="w-full h-full mb-20">
         <img className="w-full h-120 object-cover dark:brightness-50" src={fundo} alt="imagem de casa moderna" />
-        
-
         {/* nav de pesquisa */}
-        <div className="flex shadow-md items-center justify-center gap-4 absolute left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] h-20  rounded-2xl bg-card">
+        <div className="hidden shadow-md items-center md:flex lg:flex justify-center gap-4 absolute left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] h-20  rounded-2xl bg-card">
           <InputGroup className="max-w-xs">
             <InputGroupInput placeholder="Search..." />
             <InputGroupAddon>
@@ -60,6 +54,15 @@ export default function Home() {
                 </SelectGroup>
               </SelectContent>
             </Select>
+        </div>
+        <div className="flex shadow-md items-center md:hidden lg:hidden justify-center gap-4 absolute left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] h-20  rounded-2xl bg-card">
+          <InputGroup className="max-w-sm">
+            <InputGroupInput placeholder="Search..." />
+            <InputGroupAddon>
+              <Search />
+            </InputGroupAddon>
+            {/* <InputGroupAddon align="inline-end">12 results</InputGroupAddon> */}
+          </InputGroup> 
         </div>
       </div>
         <PropertyGrid></PropertyGrid>

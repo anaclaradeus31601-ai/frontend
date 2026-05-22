@@ -3,9 +3,9 @@ import Login from "./pages/client/Login";
 import Home from "./pages/client/Home";
 import Register from "./pages/client/Register";
 import CreateProperty from "./pages/client/Preview";
-import CreateOwner from "./pages/client/Owner";
+// import CreateOwner from "./pages/client/Owner";
 import ShowProperty from "./pages/client/ShowProperty";
-import AdminLayout from "./layouts/AdminLayout";
+import AdminLayout from "./components/layout/AdminLayout";
 import ShowClients from "./pages/admin/Clients/Show";
 import CreateClients from "./pages/admin/Clients/Create";
 import EditClients from "./pages/admin/Clients/Edit";
@@ -33,7 +33,10 @@ import ShowSettings from "./pages/admin/Configurations/Show";
 import IndexOwners from "./pages/admin/Owners/Index";
 import IndexContracts from "./pages/admin/Contracts/Index";
 import IndexVisits from "./pages/admin/Visits/Index";
-import DefaultLayout from "./layouts/DefaultLayout";
+import DefaultLayout from "./components/layout/DefaultLayout";
+import IndexProperties from "./pages/admin/Properties/Index";
+import IndexRealtors from "./pages/admin/Realtors/Index";
+import IndexPayments from "./pages/admin/Payments/Index";
 
 export default function App() {
   return (
@@ -75,7 +78,8 @@ export default function App() {
           <Route path="owners/edit/:id" element={<EditOwners/>} />
 
           {/* Properties */}
-          <Route path="properties" element={<ShowProperties />} />
+          <Route path="properties" element={<IndexProperties />} />
+          <Route path="properties/:id" element={<ShowProperties />} />
           <Route path="properties/create" element={<CreateProperties />} />
           <Route path="properties/edit/:id" element={<EditProperties />} />
 
@@ -86,12 +90,14 @@ export default function App() {
           <Route path="visits/edit/:id" element={<EditVisits/>} />
 
           {/* Realtors */}
-          <Route path="realtors" element={<ShowRealtors/>} />
+          <Route path="realtors" element={<IndexRealtors/>} />
+          <Route path="realtors/:id" element={<ShowRealtors/>} />
           <Route path="realtors/create" element={<CreateRealtors/>} />
           <Route path="realtors/edit/:id" element={<EditRealtors/>} />
 
           {/* Payments */}
-          <Route path="payments" element={<ShowPayments/>} />
+          <Route path="payments" element={<IndexPayments/>} />
+          <Route path="payments/:id" element={<ShowPayments/>} />
           <Route path="payments/create" element={<CreatePayments/>} />
           <Route path="payments/edit/:id" element={<EditPayments/>} />
 

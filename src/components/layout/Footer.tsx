@@ -9,7 +9,7 @@ export default function Footer() {
             <div className="w-3/7 flex flex-col items-center ml-4">
                 <div className="flex items-center ml-4">
                     <h1 className="text-2xl font-bold">estate</h1>
-                    <p className="text-2xl text-(--accent) font-medium">flow</p>
+                    <p className="text-2xl text-text-primary  font-medium">flow</p>
                 </div>
                 {/* descrição */}
                 <p className="text-(--text) hidden md:flex lg:flex text-sm">A EstateFlow é a plataforma definitiva para quem busca comprar, vender ou alugar imóveis. Com uma interface intuitiva e recursos avançados de busca, oferecemos uma experiência única para nossos usuários. Encontre o imóvel dos seus sonhos com facilidade e segurança na EstateFlow.</p>
@@ -38,7 +38,7 @@ export default function Footer() {
                 
             </div>
         </div>
-        <p className="text-(--text) mt-4">© 2024 EstateFlow. Todos os direitos reservados.</p>
+        <p className="text-h mt-4">© 2024 EstateFlow. Todos os direitos reservados.</p>
     </div>
   );
 }

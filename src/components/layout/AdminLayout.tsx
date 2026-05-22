@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
-import AdminHeader from "../components/layout/LateralAdmin";
-import TopAdmin from "../components/layout/TopAdmin";
+import AdminHeader from "./AsideAdmin";
+import TopAdmin from "../../components/layout/TopAdmin";
 
 
 export default function AdminLayout() {

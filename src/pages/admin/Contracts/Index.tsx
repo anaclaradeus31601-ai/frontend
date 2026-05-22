@@ -101,7 +101,6 @@ export default function IndexContracts() {
     const expired = contracts.filter(contract => contract.status === "EXPIRED");
     const cancelled = contracts.filter(contract => contract.status === "CANCELLED");
 
-
     if(status !== "") {
         contracts = contracts.filter(contract => contract.status === status);
     }
@@ -156,8 +155,8 @@ export default function IndexContracts() {
                             <TableRow>
                                 <TableHead className="text-center">Cliente</TableHead>
                                 <TableHead className="text-center">Doc Url</TableHead>
-                                <TableHead className="text-center">Início</TableHead>
-                                <TableHead className="text-center">Fim</TableHead>
+                                <TableHead className="text-center">Data de Início</TableHead>
+                                <TableHead className="text-center">Data de Vencimento</TableHead>
                                 <TableHead className="text-center">Valor</TableHead>
                                 <TableHead className="text-center">Status</TableHead>
                             </TableRow>

@@ -9,6 +9,7 @@ import {
   Wallet,
   HandshakeIcon,
   type LucideIcon,
+  LayoutDashboardIcon,
 } from "lucide-react";
 
 type MenuItem = {
@@ -24,6 +25,11 @@ type BottomItem = {
 };
 
 export const menuItems : MenuItem[] = [
+  {
+    label: "Dashboard",
+    icon: LayoutDashboardIcon,
+    href: "/admin",
+  },
   {
     label: "Análises",
     icon: BarChart3,

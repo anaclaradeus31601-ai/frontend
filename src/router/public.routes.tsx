@@ -1,5 +1,5 @@
 import type { RouteObject } from "react-router-dom";
-import DefaultLayout from "../layouts/DefaultLayout";
+import DefaultLayout from "../components/layout/DefaultLayout";
 import Home from "../pages/client/Home";
 
 

@@ -38,13 +38,13 @@ export default function TopAdmin() {
                     />
                 </label>
 
-                <div className="text-sm text-muted-foreground capitalize">
+                <div className="text-sm hidden md:block lg:block text-muted-foreground capitalize">
                     {formattedDate}
                 </div>
             </div>
 
             {/* Right */}
-            <div className="flex items-center gap-2">
+            <div className="items-center gap-2 hidden md:flex lg:flex">
                 <Link to="/settings" className={button}>
                     <Settings className="h-5 w-5" />
                 </Link>

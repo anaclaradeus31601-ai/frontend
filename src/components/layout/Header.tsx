@@ -26,7 +26,6 @@ export default function Header() {
     useEffect(() => {
 
         const handleScroll = () => {
-            console.log(window.scrollY);
             setScrolled(window.scrollY > 94);
         };
 
@@ -40,12 +39,12 @@ export default function Header() {
 
 
     const navigate = useNavigate();
-    const isLoggedIn = false; //mudar ao fazer login
+    const isLoggedIn = true; //mudar ao fazer login
 
   return (    
     <div className={` w-full p-4 h-16 z-50 fixed flex items-center justify-center ${scrolled ? "bg-background/70 backdrop-blur-md shadow-md " : "bg-transparent"} `}>
-        <div className="w-full flex h-16 justify-between gap-12 items-center">
-            <div className="flex items-center ml-4 w-34.5">
+        <div className="w-full flex h-16 items-center gap-4 justify-between">
+            <div className="flex items-center mr-auto w-34.5">
                 <h1 className="text-2xl font-bold">estate</h1>
                 <p className="text-2xl text-text-primary font-medium">flow</p>
             </div>
@@ -60,7 +59,7 @@ export default function Header() {
             </div>
             {/* mudar ao fazer login */}
             {(isLoggedIn) ? (
-                <div className="flex mr-8 items-center">
+                <div className="flex items-center">
                     {/* <div className="hidden md:flex lg:flex gap-4 mr-4">
                         <div className=" flex items-center gap-2">
                             <h3 className="text-h ml-4">Ola, Joao</h3>
@@ -80,7 +79,7 @@ export default function Header() {
                     </div>
                 </div>
             ) : (
-            <div className="flex gap-2 mr-4">
+            <div className="flex gap-2">
                 <Button className="border bg-transparent text-foreground hover:bg-transparent border-foreground">Login</Button>
                 <Button className="bg-text-primary text-white border-text-primary">Anunicar imóvel</Button>
             </div>

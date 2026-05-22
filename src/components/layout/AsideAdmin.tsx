@@ -4,7 +4,7 @@ import {
 } from "lucide-react";
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { Button } from "#components/ui/button";
 import { Separator } from "#components/ui/separator";
 import { cn } from "../../lib/utils";
@@ -44,24 +44,15 @@ export default function AdminHeader() {
           <AvatarImage src="https://github.com/shadcn.png" />
           <AvatarFallback>JD</AvatarFallback>
         </Avatar>
-
-        {menuOpen && (
-          <div className="mt-3 text-center">
-            <p className="font-medium">John Doe</p>
-            <p className="text-sm text-muted-foreground">
-              johndoe@gmail.com
-            </p>
-          </div>
-        )}
       </div>
 
       {/* Menu */}
-      <nav className="mt-6 flex flex-col gap-1 px-3">
+      <nav className="mt-4 flex flex-col gap-1 px-3">
         {menuItems.map((item) => {
           const Icon = item.icon;
 
           return (
-            <Link key={item.href} to={item.href}>
+            <NavLink key={item.href} to={item.href}>
               <Button
                 variant="ghost"
                 className={cn(
@@ -73,7 +64,7 @@ export default function AdminHeader() {
 
                 {menuOpen && <span>{item.label}</span>}
               </Button>
-            </Link>
+            </NavLink>
           );
         })}
 
@@ -83,7 +74,7 @@ export default function AdminHeader() {
           const Icon = item.icon;
 
           return (
-            <Link key={item.href} to={item.href}>
+            <NavLink key={item.href} to={item.href}>
               <Button
                 variant="ghost"
                 className={cn(
@@ -95,7 +86,7 @@ export default function AdminHeader() {
 
                 {menuOpen && <span>{item.label}</span>}
               </Button>
-            </Link>
+            </NavLink>
           );
         })}
       </nav>
