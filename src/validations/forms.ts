@@ -1,19 +1,20 @@
+// validations/forms.ts
 import { z } from "zod";
 
-// Helpers
+// ============ HELPERS ============
 const requiredText = (field: string) => z.string().trim().min(1, `${field} é obrigatório.`);
 const optionalText = z.string().optional();
 const email = z.string().trim().email("Informe um e-mail válido.");
 const positiveNumber = (field: string) =>
   z.string().trim().min(1, `${field} é obrigatório.`).refine((value) => Number(value) >= 0, `${field} deve ser maior ou igual a zero.`);
 
-// CLIENT AUTH
-export const loginFormSchema = z.object({
+// ============ AUTH ============
+export const loginSchema = z.object({
   email: email,
   password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres."),
 });
 
-export const registerFormSchema = z
+export const registerSchema = z
   .object({
     name: requiredText("Nome"),
     email: email,
@@ -26,18 +27,18 @@ export const registerFormSchema = z
     path: ["confirmPassword"],
   });
 
-// ADMIN - CLIENTS
-export const createClientFormSchema = z.object({
+// ============ ADMIN - CLIENTS ============
+export const createClientSchema = z.object({
   name: requiredText("Nome"),
   email: email,
   password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres."),
   phone: optionalText,
   avatar: optionalText,
   role: requiredText("Função"),
-  emailVerified: optionalText,
+  emailVerified: z.boolean().optional(),
 });
 
-export const editClientFormSchema = z.object({
+export const editClientSchema = z.object({
   name: requiredText("Nome"),
   cpf: optionalText,
   birthDate: optionalText,
@@ -48,8 +49,8 @@ export const editClientFormSchema = z.object({
   notes: optionalText,
 });
 
-// ADMIN - OWNERS
-export const createOwnerFormSchema = z.object({
+// ============ ADMIN - OWNERS ============
+export const createOwnerSchema = z.object({
   name: requiredText("Nome"),
   cpfCnpj: requiredText("CPF/CNPJ"),
   email: email,
@@ -57,7 +58,7 @@ export const createOwnerFormSchema = z.object({
   address: optionalText,
 });
 
-export const editOwnerFormSchema = z.object({
+export const editOwnerSchema = z.object({
   name: requiredText("Nome"),
   cpfCnpj: requiredText("CPF/CNPJ"),
   email: email,
@@ -71,18 +72,18 @@ export const editOwnerFormSchema = z.object({
   notes: optionalText,
 });
 
-// ADMIN - REALTORS
-export const createRealtorFormSchema = z.object({
+// ============ ADMIN - REALTORS ============
+export const createRealtorSchema = z.object({
   name: requiredText("Nome"),
   email: email,
   phone: optionalText,
   password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres."),
   avatar: optionalText,
   role: requiredText("Função"),
-  emailVerified: optionalText,
+  emailVerified: z.boolean().optional(),
 });
 
-export const editRealtorFormSchema = z.object({
+export const editRealtorSchema = z.object({
   name: requiredText("Nome"),
   email: email,
   phone: optionalText,
@@ -92,8 +93,8 @@ export const editRealtorFormSchema = z.object({
   bio: optionalText,
 });
 
-// ADMIN - PROPERTIES
-export const createPropertyFormSchema = z.object({
+// ============ ADMIN - PROPERTIES ============
+export const createPropertySchema = z.object({
   ownerId: requiredText("Proprietário"),
   realtorId: optionalText,
   title: requiredText("Título"),
@@ -103,10 +104,10 @@ export const createPropertyFormSchema = z.object({
   rentPrice: optionalText,
   salePrice: optionalText,
   description: requiredText("Descrição"),
-  bedrooms: positiveNumber("Quartos"),
-  bathrooms: positiveNumber("Banheiros"),
-  garages: positiveNumber("Garagens"),
-  area: positiveNumber("Área"),
+  bedrooms: z.number().min(0, "Quartos deve ser maior ou igual a zero"),
+  bathrooms: z.number().min(0, "Banheiros deve ser maior ou igual a zero"),
+  garages: z.number().min(0, "Garagens deve ser maior ou igual a zero"),
+  area: z.number().min(0, "Área deve ser maior ou igual a zero"),
   street: requiredText("Rua"),
   number: requiredText("Número"),
   complement: optionalText,
@@ -120,12 +121,16 @@ export const createPropertyFormSchema = z.object({
   latitude: optionalText,
   longitude: optionalText,
   featured: optionalText,
+  images: optionalText,
+  videos: optionalText,
+  tour: optionalText,
 });
 
-export const editPropertyFormSchema = z.object({
+export const editPropertySchema = z.object({
   title: requiredText("Título"),
   transactionType: requiredText("Tipo de transação"),
   category: requiredText("Categoria"),
+  status: requiredText("Status"),
   rentPrice: optionalText,
   salePrice: optionalText,
   description: requiredText("Descrição"),
@@ -146,21 +151,26 @@ export const editPropertyFormSchema = z.object({
   latitude: optionalText,
   longitude: optionalText,
   featured: optionalText,
+  owner: optionalText,
+  realtor: optionalText,
+  tour: optionalText,
+  video: optionalText,
+  images: optionalText,
 });
 
-// ADMIN - VISITS
-export const createVisitFormSchema = z.object({
+// ============ ADMIN - VISITS ============
+export const createVisitSchema = z.object({
   propertyId: requiredText("Imóvel"),
   clientId: requiredText("Cliente"),
   realtorId: requiredText("Corretor"),
   scheduledAt: requiredText("Data e hora"),
   status: requiredText("Status"),
-  duration: optionalText,
+  duration: z.number().min(0, "Duração deve ser maior ou igual a zero").optional(),
   notes: optionalText,
   feedback: optionalText,
 });
 
-export const editVisitFormSchema = z.object({
+export const editVisitSchema = z.object({
   property: requiredText("Imóvel"),
   client: requiredText("Cliente"),
   realtor: requiredText("Corretor"),
@@ -170,8 +180,8 @@ export const editVisitFormSchema = z.object({
   notes: optionalText,
 });
 
-// ADMIN - CONTRACTS
-export const createContractFormSchema = z.object({
+// ============ ADMIN - CONTRACTS ============
+export const createContractSchema = z.object({
   propertyId: requiredText("Imóvel"),
   clientId: requiredText("Cliente"),
   transactionType: requiredText("Tipo de transação"),
@@ -184,7 +194,7 @@ export const createContractFormSchema = z.object({
   notes: requiredText("Termos"),
 });
 
-export const editContractFormSchema = z.object({
+export const editContractSchema = z.object({
   client: requiredText("Cliente"),
   property: requiredText("Imóvel"),
   realtor: optionalText,
@@ -196,8 +206,8 @@ export const editContractFormSchema = z.object({
   notes: requiredText("Cláusulas"),
 });
 
-// ADMIN - PAYMENTS
-export const createPaymentFormSchema = z.object({
+// ============ ADMIN - PAYMENTS ============
+export const createPaymentSchema = z.object({
   contractId: requiredText("Contrato"),
   userId: requiredText("Usuário"),
   amount: requiredText("Valor"),
@@ -208,7 +218,7 @@ export const createPaymentFormSchema = z.object({
   stripeInvoice: optionalText,
 });
 
-export const editPaymentFormSchema = z.object({
+export const editPaymentSchema = z.object({
   client: requiredText("Cliente"),
   contract: requiredText("Contrato"),
   amount: requiredText("Valor"),
@@ -220,8 +230,8 @@ export const editPaymentFormSchema = z.object({
   notes: optionalText,
 });
 
-// CLIENT FORMS
-export const ownerLandingFormSchema = z.object({
+// ============ CLIENT PAGES ============
+export const ownerLandingSchema = z.object({
   name: requiredText("Nome"),
   email: email,
   phone: requiredText("Telefone"),
@@ -229,7 +239,7 @@ export const ownerLandingFormSchema = z.object({
   address: requiredText("Endereço"),
 });
 
-export const previewPropertyFormSchema = z.object({
+export const previewPropertySchema = z.object({
   title: requiredText("Título"),
   description: requiredText("Descrição"),
   city: requiredText("Cidade"),
@@ -241,22 +251,22 @@ export const previewPropertyFormSchema = z.object({
   image: z.string().trim().url("Informe uma URL de imagem válida."),
 });
 
-// Export types for TypeScript
-export type LoginFormData = z.infer<typeof loginFormSchema>;
-export type RegisterFormData = z.infer<typeof registerFormSchema>;
-export type CreateClientFormData = z.infer<typeof createClientFormSchema>;
-export type EditClientFormData = z.infer<typeof editClientFormSchema>;
-export type CreateOwnerFormData = z.infer<typeof createOwnerFormSchema>;
-export type EditOwnerFormData = z.infer<typeof editOwnerFormSchema>;
-export type CreateRealtorFormData = z.infer<typeof createRealtorFormSchema>;
-export type EditRealtorFormData = z.infer<typeof editRealtorFormSchema>;
-export type CreatePropertyFormData = z.infer<typeof createPropertyFormSchema>;
-export type EditPropertyFormData = z.infer<typeof editPropertyFormSchema>;
-export type CreateVisitFormData = z.infer<typeof createVisitFormSchema>;
-export type EditVisitFormData = z.infer<typeof editVisitFormSchema>;
-export type CreateContractFormData = z.infer<typeof createContractFormSchema>;
-export type EditContractFormData = z.infer<typeof editContractFormSchema>;
-export type CreatePaymentFormData = z.infer<typeof createPaymentFormSchema>;
-export type EditPaymentFormData = z.infer<typeof editPaymentFormSchema>;
-export type OwnerLandingFormData = z.infer<typeof ownerLandingFormSchema>;
-export type PreviewPropertyFormData = z.infer<typeof previewPropertyFormSchema>;
+// ============ TYPES ============
+export type LoginFormData = z.infer<typeof loginSchema>;
+export type RegisterFormData = z.infer<typeof registerSchema>;
+export type CreateClientFormData = z.infer<typeof createClientSchema>;
+export type EditClientFormData = z.infer<typeof editClientSchema>;
+export type CreateOwnerFormData = z.infer<typeof createOwnerSchema>;
+export type EditOwnerFormData = z.infer<typeof editOwnerSchema>;
+export type CreateRealtorFormData = z.infer<typeof createRealtorSchema>;
+export type EditRealtorFormData = z.infer<typeof editRealtorSchema>;
+export type CreatePropertyFormData = z.infer<typeof createPropertySchema>;
+export type EditPropertyFormData = z.infer<typeof editPropertySchema>;
+export type CreateVisitFormData = z.infer<typeof createVisitSchema>;
+export type EditVisitFormData = z.infer<typeof editVisitSchema>;
+export type CreateContractFormData = z.infer<typeof createContractSchema>;
+export type EditContractFormData = z.infer<typeof editContractSchema>;
+export type CreatePaymentFormData = z.infer<typeof createPaymentSchema>;
+export type EditPaymentFormData = z.infer<typeof editPaymentSchema>;
+export type OwnerLandingFormData = z.infer<typeof ownerLandingSchema>;
+export type PreviewPropertyFormData = z.infer<typeof previewPropertySchema>;

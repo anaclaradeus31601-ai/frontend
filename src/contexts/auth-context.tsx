@@ -1,43 +1,71 @@
-import { createContext, useContext, type ReactNode, useState, useEffect } from "react";
-import type { User, UserRole } from "../types/database";
+// contexts/auth-context.tsx
+import { 
+  createContext, 
+  useContext, 
+  type ReactNode, 
+  useState, 
+  useEffect,
+  useCallback 
+} from "react";
+import type { UserRole, UserPublicData } from "../types/database";
+import { apiRequest, clearAccessToken, getAccessToken } from "../lib/api";
 
 interface AuthContextType {
-  user: User | null;
+  user: UserPublicData | null;
   loading: boolean;
   isAuthenticated: boolean;
+  setUser: (user: UserPublicData | null) => void; // 👈 Adicionado
   hasRole: (role: UserRole | UserRole[]) => boolean;
-  logout: () => void;
+  logout: () => Promise<void>; // 👈 Agora é async
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserPublicData | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Verifica sessão no backend ao carregar
   useEffect(() => {
-    // Recuperar usuário do localStorage ou de uma API
-    const storedUser = localStorage.getItem("auth_user");
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch {
-        localStorage.removeItem("auth_user");
+    const checkSession = async () => {
+      const accessToken = getAccessToken();
+
+      if (!accessToken) {
+        setUser(null);
+        setLoading(false);
+        return;
       }
-    }
-    setLoading(false);
+
+      try {
+        const data = await apiRequest<UserPublicData>('/users/me');
+        setUser(data);
+      } catch {
+        clearAccessToken();
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkSession();
   }, []);
 
-  const hasRole = (roles: UserRole | UserRole[]) => {
+  const hasRole = useCallback((roles: UserRole | UserRole[]) => {
     if (!user) return false;
     const roleArray = Array.isArray(roles) ? roles : [roles];
     return roleArray.includes(user.role);
-  };
+  }, [user]);
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("auth_user");
-  };
+  const logout = useCallback(async () => {
+    try {
+      await apiRequest('/auth/logout', { method: 'POST' });
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      clearAccessToken();
+      setUser(null);
+    }
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -45,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         loading,
         isAuthenticated: !!user,
+        setUser, // 👈 Expõe setUser para o useLogin
         hasRole,
         logout,
       }}

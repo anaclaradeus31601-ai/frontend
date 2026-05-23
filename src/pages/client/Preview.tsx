@@ -9,7 +9,7 @@ import {
   DollarSign,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { previewPropertySchema } from "../../validations/client-forms";
+import { previewPropertySchema } from "../../validations/forms";
 
 export default function CreateProperty() {
   const [form, setForm] = useState({

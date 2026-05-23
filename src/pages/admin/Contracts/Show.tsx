@@ -76,7 +76,7 @@ export default function ShowContracts() {
     ];
 
     const { id } = useParams<{ id: string }>();
-    let contract = contracts.find(c => c.id == Number(id));
+    const contract = contracts.find(c => c.id == Number(id));
 
     return (
         <div className="p-6">

@@ -7,7 +7,7 @@ import {
   FileText,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { ownerLandingSchema } from "../../validations/client-forms";
+import { ownerLandingSchema } from "../../validations/forms";
 
 export default function CreateOwner() {
   const [form, setForm] = useState({

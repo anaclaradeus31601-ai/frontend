@@ -1,4 +1,4 @@
-import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { apiRequest } from "../lib/api";
 import type { EntityId, QueryParams } from "../types/database";
 
@@ -24,17 +24,19 @@ export function useCrudResource<TEntity extends { id: EntityId }, TCreateInput, 
   endpoint: string,
   options?: UseCrudResourceOptions,
 ): UseCrudResourceResult<TEntity, TCreateInput, TUpdateInput> {
+  const autoFetch = options?.autoFetch;
+  const initialParams = options?.initialParams;
   const [data, setData] = useState<TEntity[]>([]);
-  const [loading, setLoading] = useState(Boolean(options?.autoFetch));
+  const [loading, setLoading] = useState(Boolean(autoFetch));
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function fetchAll(params?: QueryParams) {
+  const fetchAll = useCallback(async (params?: QueryParams) => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await apiRequest<TEntity[]>(endpoint, undefined, params ?? options?.initialParams);
+      const response = await apiRequest<TEntity[]>(endpoint, undefined, params ?? initialParams);
       setData(response);
       return response;
     } catch (caughtError) {
@@ -44,7 +46,7 @@ export function useCrudResource<TEntity extends { id: EntityId }, TCreateInput, 
     } finally {
       setLoading(false);
     }
-  }
+  }, [endpoint, initialParams]);
 
   async function fetchById(id: EntityId) {
     setLoading(true);
@@ -128,12 +130,12 @@ export function useCrudResource<TEntity extends { id: EntityId }, TCreateInput, 
   }
 
   useEffect(() => {
-    if (options?.autoFetch === false) {
+    if (autoFetch === false) {
       return;
     }
 
     void fetchAll().catch(() => undefined);
-  }, []);
+  }, [autoFetch, fetchAll]);
 
   return {
     data,

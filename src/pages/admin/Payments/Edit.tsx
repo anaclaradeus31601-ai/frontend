@@ -1,100 +1,63 @@
-import { Button } from "#components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "#components/ui/card";
-import { Input } from "#components/ui/input";
-import { Label } from "#components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "#components/ui/select";
-import { Textarea } from "#components/ui/textarea";
-import { ChevronLeft } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
-import { createZodFormHandler } from "../../../lib/zod-form";
-import { editPaymentSchema } from "../../../validations/admin-forms";
+import { EditForm } from "#components/shared/edit-form";
+import { useParams } from "react-router-dom";
+import { editPaymentSchema } from "../../../validations/forms";
 
 export default function EditPayments() {
   const { id } = useParams();
-  const navigate = useNavigate();
 
   return (
-    <div className="p-6 space-y-6">
-      <Button type="button" variant="ghost" className="w-fit px-0" onClick={() => navigate(-1)}>
-        <ChevronLeft />
-        Voltar
-      </Button>
-
-      <div className="space-y-1">
-        <h2 className="text-2xl font-bold tracking-tight">Editar Pagamento</h2>
-        <p className="text-sm text-muted-foreground">Atualize os dados do pagamento {id ? `#${id}` : ""}.</p>
-      </div>
-
-      <form className="space-y-6" onSubmit={createZodFormHandler(editPaymentSchema)}>
-        <Card>
-          <CardHeader>
-            <CardTitle>Dados do pagamento</CardTitle>
-            <CardDescription>Revise cobrança, vencimento e situação financeira.</CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="payment-client">Cliente</Label>
-              <Input id="payment-client" defaultValue="John Doe" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="payment-contract">Contrato</Label>
-              <Input id="payment-contract" defaultValue="Contrato #001" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="payment-amount">Valor</Label>
-              <Input id="payment-amount" defaultValue="R$ 2.500,00" />
-            </div>
-            <div className="space-y-2">
-              <Label>Método</Label>
-              <Select defaultValue="pix">
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selecione" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pix">Pix</SelectItem>
-                  <SelectItem value="credit-card">Cartão</SelectItem>
-                  <SelectItem value="bank-slip">Boleto</SelectItem>
-                  <SelectItem value="transfer">Transferência</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="payment-due-date">Data de vencimento</Label>
-              <Input id="payment-due-date" type="date" defaultValue="2026-05-30" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="payment-paid-date">Data de pagamento</Label>
-              <Input id="payment-paid-date" type="date" defaultValue="2026-05-25" />
-            </div>
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <Select defaultValue="completed">
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selecione" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pending">Pendente</SelectItem>
-                  <SelectItem value="active">Ativo</SelectItem>
-                  <SelectItem value="completed">Concluído</SelectItem>
-                  <SelectItem value="refunded">Reembolsado</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="payment-reference">Referência</Label>
-              <Input id="payment-reference" defaultValue="Maio/2026" />
-            </div>
-            <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="payment-notes">Observações</Label>
-              <Textarea id="payment-notes" defaultValue="Pagamento recebido com comprovante enviado pelo cliente." />
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="flex justify-end gap-3">
-          <Button type="submit">Salvar alterações</Button>
-        </div>
-      </form>
-    </div>
+    <EditForm
+      schema={editPaymentSchema}
+      title="Editar Pagamento"
+      description={`Atualize os dados do pagamento ${id ? `#${id}` : ""}.`}
+      backUrl="/admin/payments"
+      submitUrl={id ? `/admin/payments/${id}` : "/admin/payments"}
+      redirectUrl="/admin/payments"
+      submitLabel="Salvar alterações"
+      initialValues={{
+        client: "John Doe",
+        contract: "Contrato #001",
+        amount: "R$ 2.500,00",
+        paymentMethod: "pix",
+        dueDate: "2026-05-30",
+        paidDate: "2026-05-25",
+        status: "completed",
+        reference: "Maio/2026",
+        notes: "Pagamento recebido com comprovante enviado pelo cliente.",
+      }}
+      fields={[
+        { name: "client", label: "Cliente", type: "text", required: true },
+        { name: "contract", label: "Contrato", type: "text", required: true },
+        { name: "amount", label: "Valor", type: "text", required: true },
+        {
+          name: "paymentMethod",
+          label: "Método",
+          type: "select",
+          required: true,
+          options: [
+            { value: "pix", label: "Pix" },
+            { value: "credit-card", label: "Cartão" },
+            { value: "bank-slip", label: "Boleto" },
+            { value: "transfer", label: "Transferência" },
+          ],
+        },
+        { name: "dueDate", label: "Data de vencimento", type: "date", required: true },
+        { name: "paidDate", label: "Data de pagamento", type: "date" },
+        {
+          name: "status",
+          label: "Status",
+          type: "select",
+          required: true,
+          options: [
+            { value: "pending", label: "Pendente" },
+            { value: "active", label: "Ativo" },
+            { value: "completed", label: "Concluído" },
+            { value: "refunded", label: "Reembolsado" },
+          ],
+        },
+        { name: "reference", label: "Referência", type: "text" },
+        { name: "notes", label: "Observações", type: "textarea", span: "full" },
+      ]}
+    />
   );
 }

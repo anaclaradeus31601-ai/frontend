@@ -1,125 +1,133 @@
-import { Button } from "#components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "#components/ui/card";
-import { Input } from "#components/ui/input";
-import { Label } from "#components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "#components/ui/select";
-import { Textarea } from "#components/ui/textarea";
-import { ChevronLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { RelationSelect } from "#components/admin/relation-select";
-import { useClients, useProperties } from "../../../hooks";
+import { CreateForm } from "#components/shared/create-form";
+import { useClients } from "#hooks/use-users";
+import { useMemo } from "react";
+import { useProperties } from "../../../hooks/use-properties";
 import { ContractStatus, TransactionType } from "../../../types/database";
-import { createZodFormHandler } from "../../../lib/zod-form";
-import { createContractSchema } from "../../../validations/admin-forms";
+import { createContractSchema, type CreateContractFormData } from "../../../validations/forms";
+
+function parseOptionalCurrency(value?: string) {
+  if (!value?.trim()) {
+    return null;
+  }
+
+  const normalizedValue = value
+    .replace(/\./g, "")
+    .replace(",", ".")
+    .replace(/[^\d.-]/g, "");
+
+  const numericValue = Number(normalizedValue);
+  return Number.isNaN(numericValue) ? null : numericValue;
+}
 
 export default function CreateContracts() {
-    const navigate = useNavigate();
-    const { data: properties } = useProperties();
-    const { data: clients } = useClients();
+  const { data: properties, loading: loadingProperties } = useProperties();
+  const { data: clients, isLoading: loadingClients } = useClients();
 
-    const propertyOptions = properties.map((property) => ({
+  const propertyOptions = useMemo(
+    () =>
+      (properties ?? []).map((property) => ({
         id: property.id,
         label: property.title,
         description: `${property.city} - ${property.neighborhood}`,
-    }));
+      })),
+    [properties],
+  );
 
-    const clientOptions = clients.map((client) => ({
+  const clientOptions = useMemo(
+    () =>
+      (clients ?? []).map((client) => ({
         id: client.id,
         label: client.name,
         description: client.email,
-    }));
+      })),
+    [clients],
+  );
 
-    return (
-        <div className="p-6 space-y-6">
-            <Button type="button" variant="ghost" className="w-fit px-0" onClick={() => navigate(-1)}>
-                <ChevronLeft />
-                Voltar
-            </Button>
-
-            <div className="space-y-1">
-                <h2 className="text-2xl font-bold tracking-tight">Criar Contrato</h2>
-                <p className="text-sm text-muted-foreground">Monte um novo contrato com cliente, imóvel, período e valor acordado.</p>
-            </div>
-
-            <form className="space-y-6" onSubmit={createZodFormHandler(createContractSchema)}>
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Informações contratuais</CardTitle>
-                        <CardDescription>Dados principais do vínculo e da vigência.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="grid gap-4 md:grid-cols-2">
-                        <RelationSelect
-                            name="contract-property-id"
-                            label="Imóvel"
-                            placeholder="Selecione um imóvel"
-                            searchPlaceholder="Buscar imóvel por título, cidade ou ID"
-                            options={propertyOptions}
-                        />
-                        <RelationSelect
-                            name="contract-client-id"
-                            label="Cliente"
-                            placeholder="Selecione um cliente"
-                            searchPlaceholder="Buscar cliente por nome, e-mail ou ID"
-                            options={clientOptions}
-                        />
-                        <div className="space-y-2">
-                            <Label>Tipo de transação</Label>
-                            <Select>
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Selecione" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value={TransactionType.RENT}>Aluguel</SelectItem>
-                                    <SelectItem value={TransactionType.SALE}>Venda</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Status</Label>
-                            <Select defaultValue={ContractStatus.DRAFT}>
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Selecione" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value={ContractStatus.DRAFT}>Rascunho</SelectItem>
-                                    <SelectItem value={ContractStatus.ACTIVE}>Ativo</SelectItem>
-                                    <SelectItem value={ContractStatus.EXPIRED}>Expirado</SelectItem>
-                                    <SelectItem value={ContractStatus.TERMINATED}>Encerrado</SelectItem>
-                                    <SelectItem value={ContractStatus.CANCELLED}>Cancelado</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="contract-start-date">Data de início</Label>
-                            <Input id="contract-start-date" type="date" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="contract-end-date">Data de vencimento</Label>
-                            <Input id="contract-end-date" type="date" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="contract-rent-value">Valor do aluguel</Label>
-                            <Input id="contract-rent-value" placeholder="R$ 2.500,00" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="contract-sale-value">Valor da venda</Label>
-                            <Input id="contract-sale-value" placeholder="R$ 750.000,00" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="contract-doc-url">URL do documento</Label>
-                            <Input id="contract-doc-url" placeholder="https://..." />
-                        </div>
-                        <div className="space-y-2 md:col-span-2">
-                            <Label htmlFor="contract-notes">Cláusulas e observações</Label>
-                            <Textarea id="contract-notes" placeholder="Anotações internas, garantias ou detalhes importantes da negociação." />
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <div className="flex justify-end gap-3">
-                    <Button type="submit">Salvar contrato</Button>
-                </div>
-            </form>
-        </div>
-    );
+  return (
+    <CreateForm
+      schema={createContractSchema}
+      title="Criar Contrato"
+      description="Monte um novo contrato com cliente, imóvel, período e valor acordado."
+      backUrl="/admin/contracts"
+      submitUrl="/admin/contracts"
+      redirectUrl="/admin/contracts"
+      submitLabel="Salvar contrato"
+      fields={[
+        {
+          name: "propertyId",
+          label: "Imóvel",
+          type: "relation",
+          required: true,
+          relationOptions: propertyOptions,
+          relationLoading: loadingProperties,
+          relationSearchPlaceholder: "Buscar imóvel por título, cidade ou ID",
+        },
+        {
+          name: "clientId",
+          label: "Cliente",
+          type: "relation",
+          required: true,
+          relationOptions: clientOptions,
+          relationLoading: loadingClients,
+          relationSearchPlaceholder: "Buscar cliente por nome, e-mail ou ID",
+        },
+        {
+          name: "transactionType",
+          label: "Tipo de transação",
+          type: "select",
+          required: true,
+          options: [
+            { value: TransactionType.RENT, label: "Aluguel" },
+            { value: TransactionType.SALE, label: "Venda" },
+          ],
+        },
+        {
+          name: "status",
+          label: "Status",
+          type: "select",
+          required: true,
+          defaultValue: ContractStatus.DRAFT,
+          options: [
+            { value: ContractStatus.DRAFT, label: "Rascunho" },
+            { value: ContractStatus.ACTIVE, label: "Ativo" },
+            { value: ContractStatus.EXPIRED, label: "Expirado" },
+            { value: ContractStatus.TERMINATED, label: "Encerrado" },
+            { value: ContractStatus.CANCELLED, label: "Cancelado" },
+          ],
+        },
+        { name: "startDate", label: "Data de início", type: "date", required: true },
+        { name: "endDate", label: "Data de vencimento", type: "date" },
+        { name: "rentValue", label: "Valor do aluguel", type: "text", placeholder: "R$ 2.500,00" },
+        { name: "saleValue", label: "Valor da venda", type: "text", placeholder: "R$ 750.000,00" },
+        {
+          name: "documentUrl",
+          label: "URL do documento",
+          type: "url",
+          placeholder: "https://...",
+          span: "full",
+        },
+        {
+          name: "notes",
+          label: "Cláusulas e observações",
+          type: "textarea",
+          required: true,
+          rows: 5,
+          span: "full",
+          placeholder: "Anotações internas, garantias ou detalhes importantes da negociação.",
+        },
+      ]}
+      transformPayload={(data: CreateContractFormData) => ({
+        propertyId: data.propertyId,
+        clientId: data.clientId,
+        transactionType: data.transactionType,
+        status: data.status,
+        startDate: data.startDate,
+        endDate: data.endDate || null,
+        rentValue: parseOptionalCurrency(data.rentValue),
+        saleValue: parseOptionalCurrency(data.saleValue),
+        terms: data.notes,
+        documentUrl: data.documentUrl || null,
+      })}
+    />
+  );
 }

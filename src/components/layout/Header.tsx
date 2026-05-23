@@ -1,4 +1,4 @@
-import { Lightbulb, LightbulbOffIcon, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "#components/ui/button";

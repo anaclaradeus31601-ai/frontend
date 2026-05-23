@@ -35,6 +35,8 @@ import RealtorLayout from "#components/layout/RealtorLayout"
 import RealtorHome from "../pages/realtor/Home"
 import RealtorProperties from "../pages/realtor/Properties"
 import RealtorVisits from "../pages/realtor/Visits"
+import RealtorCreateVisit from "../pages/realtor/CreateVisit"
+import RealtorEditVisit from "../pages/realtor/EditVisit"
 import RealtorContracts from "../pages/realtor/Contracts"
 import RealtorProfile from "../pages/realtor/Profile"
 import RealtorSettings from "../pages/realtor/Settings"
@@ -201,6 +203,14 @@ export const RealtorRoutes: RouteObject[] = [
       {
         path: "visits",
         element: <RealtorVisits />,
+      },
+      {
+        path: "visits/create",
+        element: <RealtorCreateVisit />,
+      },
+      {
+        path: "visits/edit/:id",
+        element: <RealtorEditVisit />,
       },
       {
         path: "contracts",

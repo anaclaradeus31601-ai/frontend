@@ -1,8 +1,7 @@
-import { Controller, type Control, FieldValues, Path } from "react-hook-form";
+import { Controller, type Control, type FieldValues, type Path } from "react-hook-form";
 import { Input } from "#components/ui/input";
 import { Textarea } from "#components/ui/textarea";
 import { Label } from "#components/ui/label";
-import { Select } from "#components/ui/select";
 
 interface FormFieldProps<T extends FieldValues> {
   control: Control<T>;
@@ -117,10 +116,12 @@ export function FormSelect<T extends FieldValues>({
         control={control}
         name={name}
         render={({ field }) => (
-          <Select
+          <select
             id={String(name)}
             {...field}
-            className={error ? "border-red-500 focus:ring-red-500/20" : ""}
+            className={`flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs transition-[color,box-shadow] outline-none ${
+              error ? "border-red-500 focus:ring-red-500/20" : "border-input"
+            }`}
           >
             <option value="">Selecione uma opção</option>
             {options.map((option) => (
@@ -128,7 +129,7 @@ export function FormSelect<T extends FieldValues>({
                 {option.label}
               </option>
             ))}
-          </Select>
+          </select>
         )}
       />
       {error && <p className="text-sm text-red-500">{error}</p>}

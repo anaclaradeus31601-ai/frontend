@@ -1,16 +1,16 @@
-import { useForm as useReactHookForm, type UseFormProps } from "react-hook-form";
+import { useForm as useReactHookForm, type DefaultValues, type FieldValues, type Resolver, type UseFormProps } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
-export function useForm<TSchema extends z.ZodType<any, any>>(
-  schema: TSchema,
-  defaultValues?: z.output<TSchema>
+export function useForm<TValues extends FieldValues>(
+  schema: z.ZodType<TValues>,
+  defaultValues?: DefaultValues<TValues>
 ) {
-  const formConfig: UseFormProps<z.output<TSchema>> = {
-    resolver: zodResolver(schema) as any,
+  const formConfig: UseFormProps<TValues> = {
+    resolver: zodResolver(schema as never) as Resolver<TValues>,
     defaultValues,
     mode: "onChange",
   };
 
-  return useReactHookForm<z.output<TSchema>>(formConfig);
+  return useReactHookForm<TValues>(formConfig);
 }

@@ -1,107 +1,121 @@
-import { Button } from "#components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "#components/ui/card";
-import { Input } from "#components/ui/input";
-import { Label } from "#components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "#components/ui/select";
-import { ChevronLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { RelationSelect } from "#components/admin/relation-select";
+import { CreateForm } from "#components/shared/create-form";
+import { useEffect, useMemo, useState } from "react";
 import { useContracts, useUsers } from "../../../hooks";
-import { PaymentStatus } from "../../../types/database";
-import { createZodFormHandler } from "../../../lib/zod-form";
-import { createPaymentSchema } from "../../../validations/admin-forms";
+import { PaymentStatus, type UserPublicData } from "../../../types/database";
+import { createPaymentSchema, type CreatePaymentFormData } from "../../../validations/forms";
+
+function parseCurrency(value: string) {
+  const normalizedValue = value
+    .replace(/\./g, "")
+    .replace(",", ".")
+    .replace(/[^\d.-]/g, "");
+
+  return Number(normalizedValue);
+}
 
 export default function CreatePayments() {
-    const navigate = useNavigate();
-    const { data: contracts } = useContracts();
-    const { data: users } = useUsers();
+  const { data: contracts, loading: loadingContracts } = useContracts();
+  const { fetchUsers } = useUsers();
+  const [users, setUsers] = useState<UserPublicData[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
 
-    const contractOptions = contracts.map((contract) => ({
+  useEffect(() => {
+    let mounted = true;
+
+    fetchUsers()
+      .then((data) => {
+        if (mounted) {
+          setUsers(data);
+        }
+      })
+      .finally(() => {
+        if (mounted) {
+          setLoadingUsers(false);
+        }
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [fetchUsers]);
+
+  const contractOptions = useMemo(
+    () =>
+      (contracts ?? []).map((contract) => ({
         id: contract.id,
         label: contract.property?.title ?? `Contrato ${contract.id}`,
         description: contract.client?.name ?? contract.status,
-    }));
+      })),
+    [contracts],
+  );
 
-    const userOptions = users.map((user) => ({
+  const userOptions = useMemo(
+    () =>
+      users.map((user) => ({
         id: user.id,
         label: user.name,
         description: user.email,
-    }));
+      })),
+    [users],
+  );
 
-    return (
-        <div className="p-6 space-y-6">
-            <Button type="button" variant="ghost" className="w-fit px-0" onClick={() => navigate(-1)}>
-                <ChevronLeft />
-                Voltar
-            </Button>
-
-            <div className="space-y-1">
-                <h2 className="text-2xl font-bold tracking-tight">Criar Pagamento</h2>
-                <p className="text-sm text-muted-foreground">Registre um novo pagamento vinculado ao cliente e contrato correspondente.</p>
-            </div>
-
-            <form className="space-y-6" onSubmit={createZodFormHandler(createPaymentSchema)}>
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Dados do pagamento</CardTitle>
-                        <CardDescription>Preencha valores, vencimento e status atual da cobrança.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="grid gap-4 md:grid-cols-2">
-                        <RelationSelect
-                            name="payment-contract-id"
-                            label="Contrato"
-                            placeholder="Selecione um contrato"
-                            searchPlaceholder="Buscar contrato por imóvel, cliente ou ID"
-                            options={contractOptions}
-                        />
-                        <RelationSelect
-                            name="payment-user-id"
-                            label="Usuário"
-                            placeholder="Selecione um usuário"
-                            searchPlaceholder="Buscar usuário por nome, e-mail ou ID"
-                            options={userOptions}
-                        />
-                        <div className="space-y-2">
-                            <Label htmlFor="payment-amount">Valor</Label>
-                            <Input id="payment-amount" placeholder="R$ 2.500,00" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="payment-due-date">Data de vencimento</Label>
-                            <Input id="payment-due-date" type="date" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="payment-paid-date">Data de pagamento</Label>
-                            <Input id="payment-paid-date" type="date" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Status</Label>
-                            <Select defaultValue={PaymentStatus.PENDING}>
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Selecione" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value={PaymentStatus.PENDING}>Pendente</SelectItem>
-                                    <SelectItem value={PaymentStatus.COMPLETED}>Concluído</SelectItem>
-                                    <SelectItem value={PaymentStatus.FAILED}>Falhou</SelectItem>
-                                    <SelectItem value={PaymentStatus.REFUNDED}>Reembolsado</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="payment-stripe-intent">Stripe Payment Intent</Label>
-                            <Input id="payment-stripe-intent" placeholder="pi_..." />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="payment-stripe-invoice">Stripe Invoice</Label>
-                            <Input id="payment-stripe-invoice" placeholder="in_..." />
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <div className="flex justify-end gap-3">
-                    <Button type="submit">Salvar pagamento</Button>
-                </div>
-            </form>
-        </div>
-    );
+  return (
+    <CreateForm
+      schema={createPaymentSchema}
+      title="Criar Pagamento"
+      description="Registre um novo pagamento vinculado ao cliente e contrato correspondente."
+      backUrl="/admin/payments"
+      submitUrl="/admin/payments"
+      redirectUrl="/admin/payments"
+      submitLabel="Salvar pagamento"
+      fields={[
+        {
+          name: "contractId",
+          label: "Contrato",
+          type: "relation",
+          required: true,
+          relationOptions: contractOptions,
+          relationLoading: loadingContracts,
+          relationSearchPlaceholder: "Buscar contrato por imóvel, cliente ou ID",
+        },
+        {
+          name: "userId",
+          label: "Usuário",
+          type: "relation",
+          required: true,
+          relationOptions: userOptions,
+          relationLoading: loadingUsers,
+          relationSearchPlaceholder: "Buscar usuário por nome, e-mail ou ID",
+        },
+        { name: "amount", label: "Valor", type: "text", required: true, placeholder: "R$ 2.500,00" },
+        { name: "dueDate", label: "Data de vencimento", type: "date", required: true },
+        { name: "paidDate", label: "Data de pagamento", type: "date" },
+        {
+          name: "status",
+          label: "Status",
+          type: "select",
+          required: true,
+          defaultValue: PaymentStatus.PENDING,
+          options: [
+            { value: PaymentStatus.PENDING, label: "Pendente" },
+            { value: PaymentStatus.COMPLETED, label: "Concluído" },
+            { value: PaymentStatus.FAILED, label: "Falhou" },
+            { value: PaymentStatus.REFUNDED, label: "Reembolsado" },
+          ],
+        },
+        { name: "stripeIntent", label: "Stripe Payment Intent", type: "text", placeholder: "pi_..." },
+        { name: "stripeInvoice", label: "Stripe Invoice", type: "text", placeholder: "in_..." },
+      ]}
+      transformPayload={(data: CreatePaymentFormData) => ({
+        contractId: data.contractId,
+        userId: data.userId,
+        amount: parseCurrency(data.amount),
+        dueDate: data.dueDate,
+        paidDate: data.paidDate || null,
+        status: data.status,
+        stripePaymentIntentId: data.stripeIntent || null,
+        stripeInvoiceId: data.stripeInvoice || null,
+      })}
+    />
+  );
 }

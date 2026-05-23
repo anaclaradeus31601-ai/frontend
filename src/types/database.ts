@@ -1,5 +1,6 @@
 export type EntityId = string;
 
+// ============ ENUMS ============
 export const UserRole = {
   ADMIN: "ADMIN",
   CLIENT: "CLIENT",
@@ -60,31 +61,55 @@ export const PaymentStatus = {
 
 export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];
 
+// ============ AUTENTICAÇÃO ============
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterData {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  role?: 'CLIENT'; // Registro público sempre cria cliente
+}
+
+export interface AuthResponse {
+  user: UserPublicData;
+  // token não precisa vir na resposta, vai em cookie httpOnly
+}
+
+// types/database.ts
+
+// ✅ Dados públicos (sem password, sem datas)
+export interface UserPublicData {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string | null;
+  role: UserRole;
+  avatar?: string | null;
+}
+
+// ✅ Dados completos (admin)
+export interface User extends UserPublicData {
+  password?: string; // 👈 Opcional - NUNCA expor na API
+  emailVerified: boolean;
+  createdAt: string; // DateTime vira string no JSON
+  updatedAt: string;
+}
+
+// ✅ Session
 export interface Session {
-  id: EntityId;
-  userId: EntityId;
+  id: string;
+  userId: string;
   refreshToken: string;
-  ip: string | null;
-  userAgent: string | null;
+  ip?: string | null;
+  userAgent?: string | null;
   createdAt: string;
   updatedAt: string;
   expiresAt: string;
-}
-
-export type CreateSessionInput = Omit<Session, "id" | "createdAt" | "updatedAt">;
-export type UpdateSessionInput = Partial<CreateSessionInput>;
-
-export interface User {
-  id: EntityId;
-  email: string;
-  password: string;
-  name: string;
-  phone: string | null;
-  role: UserRole;
-  avatar: string | null;
-  emailVerified: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface Owner {
@@ -94,65 +119,80 @@ export interface Owner {
   phone: string;
   cpfCnpj: string;
   address: string | null;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Amenity {
-  id: EntityId;
+  id: string;
   name: string;
-  icon: string | null;
-  category: string | null;
-  createdAt: string;
-  updatedAt: string;
+  icon?: string | null;
+  category?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface PropertyAmenity {
-  id: EntityId;
-  propertyId: EntityId;
-  amenityId: EntityId;
-  value: string | null;
+  id: string;
+  propertyId: string;
+  amenityId: string;
+  value?: string | null;
   property?: Property;
   amenity?: Amenity;
 }
 
 export interface Property {
-  id: EntityId;
+  id: string;
   title: string;
   description: string;
   type: PropertyType;
   transactionType: TransactionType;
   status: PropertyStatus;
+  
+  // Endereço
   street: string;
   number: string;
-  complement: string | null;
+  complement?: string | null;
   neighborhood: string;
   city: string;
   state: string;
   zipCode: string;
   country: string;
+  
+  // Detalhes
   area: number;
   bedrooms: number;
   bathrooms: number;
-  garages: number | null;
-  rentPrice: number | null;
-  salePrice: number | null;
-  condominiumFee: number | null;
-  iptu: number | null;
+  garages?: number | null;
+  
+  // Valores
+  rentPrice?: number | null;
+  salePrice?: number | null;
+  condominiumFee?: number | null;
+  iptu?: number | null;
+  
+  // Mídia
   images: string[];
   videos: string[];
-  virtualTourUrl: string | null;
-  latitude: number | null;
-  longitude: number | null;
+  virtualTourUrl?: string | null; // 👈 Faltava no seu tipo
+  
+  // Localização
+  latitude?: number | null;
+  longitude?: number | null;
+  
+  // Metadados
   featured: boolean;
   views: number;
-  ownerId: EntityId;
-  realtorId: EntityId | null;
-  createdAt: string;
-  updatedAt: string;
+  
+  // Relacionamentos
+  ownerId: string;
+  realtorId?: string | null;
   owner?: Owner;
   realtor?: User | null;
   amenities?: PropertyAmenity[];
+  
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Visit {
@@ -167,6 +207,7 @@ export interface Visit {
   feedback: string | null;
   createdAt: string;
   updatedAt: string;
+  // Relacionamentos
   property?: Property;
   client?: User;
   realtor?: User | null;
@@ -186,6 +227,7 @@ export interface Contract {
   documentUrl: string | null;
   createdAt: string;
   updatedAt: string;
+  // Relacionamentos
   property?: Property;
   client?: User;
 }
@@ -202,9 +244,14 @@ export interface Payment {
   stripeInvoiceId: string | null;
   createdAt: string;
   updatedAt: string;
+  // Relacionamentos
   contract?: Contract;
   user?: User;
 }
+
+// ============ INPUT TYPES ============
+export type CreateSessionInput = Omit<Session, "id" | "createdAt" | "updatedAt">;
+export type UpdateSessionInput = Partial<CreateSessionInput>;
 
 export type CreateUserInput = Omit<User, "id" | "createdAt" | "updatedAt">;
 export type UpdateUserInput = Partial<CreateUserInput>;
@@ -212,7 +259,7 @@ export type UpdateUserInput = Partial<CreateUserInput>;
 export type CreateOwnerInput = Omit<Owner, "id" | "createdAt" | "updatedAt">;
 export type UpdateOwnerInput = Partial<CreateOwnerInput>;
 
-export type CreateAmenityInput = Omit<Amenity, "id" | "createdAt" | "updatedAt">;
+export type CreateAmenityInput = Omit<Amenity, "id">;
 export type UpdateAmenityInput = Partial<CreateAmenityInput>;
 
 export type CreatePropertyAmenityInput = Omit<PropertyAmenity, "id" | "property" | "amenity">;
@@ -230,6 +277,13 @@ export type UpdateContractInput = Partial<CreateContractInput>;
 export type CreatePaymentInput = Omit<Payment, "id" | "createdAt" | "updatedAt" | "contract" | "user">;
 export type UpdatePaymentInput = Partial<CreatePaymentInput>;
 
+// ============ UTILITÁRIOS ============
 export interface QueryParams {
+  page?: number;
+  limit?: number;
+  role?: UserRole;
+  search?: string;
+  sort?: string;
+  order?: 'asc' | 'desc';
   [key: string]: string | number | boolean | null | undefined;
 }
