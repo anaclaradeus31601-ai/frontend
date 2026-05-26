@@ -43,7 +43,7 @@ export default function CreateVisits() {
       title="Criar Visita"
       description="Agende uma visita com cliente, corretor e imóvel."
       backUrl="/admin/visits"
-      submitUrl="/admin/visits"
+      submitUrl="/admin/visit"
       redirectUrl="/admin/visits"
       submitLabel="Salvar visita"
       fields={[

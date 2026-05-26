@@ -1,134 +1,32 @@
-import { Badge } from "#components/ui/badge";
+import { Alert, AlertDescription } from "#components/ui/alert";
 import { Button } from "#components/ui/button";
-import { Input } from "#components/ui/input";
-import { Separator } from "#components/ui/separator";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "#components/ui/table";
-import { Eye, Pencil, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "#components/ui/card";
 import { useNavigate } from "react-router-dom";
 
-
 export default function IndexPayments() {
+  const navigate = useNavigate();
 
-    const [search, setSearch] = useState("");
-    const [status, setStatus] = useState("");
-    const navigate = useNavigate();
-    let payments = [
-        {
-            id: 1,
-            nameClient: "John Doe",
-            amount: 2500,
-            dueDate: "10/01/2025",
-            paidDate: "13/01/2025",
-            status: "ACTIVE",
-        },
-        {
-            id: 2,
-            nameClient: "Pagamento 2",
-            amount: 2500,
-            dueDate: "10/01/2025",
-            paidDate: "13/01/2025",
-            status: "REFUNDED",
-        },
-        {
-            id: 3,
-            nameClient: "Pagamento 3",
-            amount: 2500,
-            dueDate: "10/01/2025",
-            paidDate: "13/01/2025",
-            status: "COMPLETED",
-        },
-        {
-            id: 4,
-            nameClient: "Pagamento 4",
-            amount: 2500,
-            dueDate: "10/01/2025",
-            paidDate: "13/01/2025",
-            status: "PENDING",
-        }
-    ]
+  return (
+    <div className="p-6 space-y-6">
+      <div className="flex items-center gap-4">
+        <h2 className="text-2xl font-bold tracking-tight">Pagamentos</h2>
+        <Button className="ml-auto" onClick={() => navigate("/admin/payments/create")}>Criar Pagamento</Button>
+      </div>
 
-    if (search !== "") {
-        payments = payments.filter(payment =>
-            payment.nameClient.toLowerCase().includes(search.toLowerCase()) ||
-            payment.status.toLowerCase().includes(search.toLowerCase()) ||
-            payment.dueDate.toLowerCase().includes(search.toLowerCase()) ||
-            payment.paidDate.toLowerCase().includes(search.toLowerCase()) ||
-            payment.amount.toString().includes(search.toLowerCase())
-        );
-    }
+      <Alert>
+        <AlertDescription>
+          A API atual expõe apenas criação, atualização e remoção de pagamentos. Como ainda não existe rota `GET /payment`, esta tela não mostra listagem real para evitar mocks.
+        </AlertDescription>
+      </Alert>
 
-    if (status !== "") {
-        payments = payments.filter(payment => payment.status === status);
-    }
-
-
-    return (
-        <div className="p-6">
-            <h2 className="text-2xl font-bold tracking-tight">Pagamentos</h2>
-
-            <div className="mt-6">
-                <div className="flex">
-                    <Button onClick={() => {
-                        setStatus("");
-                    }}>Todos: {payments.length}</Button>
-                    <Button variant="success" onClick={() => {
-                        setStatus("COMPLETED");
-                    }}>Concluidos: {payments.filter(payment => payment.status === "COMPLETED").length}</Button>
-                    <Button className="bg-blue-500/50 hover:bg-blue-500/50 text-h" onClick={() => {
-                        setStatus("ACTIVE");
-                    }}>Ativos: {payments.filter(payment => payment.status === "ACTIVE").length}</Button>
-                    <Button variant="destructive" onClick={() => {
-                        setStatus("REFUNDED");
-                    }}>Reembolsados: {payments.filter(payment => payment.status === "REFUNDED").length}</Button>
-                    <Button variant="warning" onClick={() => {
-                        setStatus("PENDING");
-                    }}>Pendentes: {payments.filter(payment => payment.status === "PENDING").length}</Button>
-                </div>
-                <Separator className="mt-2"></Separator>
-                <div className="flex gap-4 mt-4 mb-4">
-                    <Input className="w-60" placeholder="Buscar" onChange={(e) => setSearch(e.target.value)}></Input>
-                    <Button onClick={() => navigate("/admin/payments/create")}>Criar Pagamento</Button>
-                    <Button className="ml-auto">Total R$: {payments.reduce((total, payment) => total + payment.amount, 0)}</Button>
-                </div>
-                <div className="border rounded-2xl">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="text-center">Nome do Cliente</TableHead>
-                                <TableHead className="text-center">Valor</TableHead>
-                                <TableHead className="text-center">Data de Vencimento</TableHead>
-                                <TableHead className="text-center">Data de Pagamento</TableHead>
-                                <TableHead className="text-center">Status</TableHead>
-                                <TableHead className="text-center">Ações</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {payments.map(payment => (
-                                <TableRow key={payment.id}>
-                                    <TableCell className="text-center">{payment.nameClient}</TableCell>
-                                    <TableCell className="text-center">{payment.amount}</TableCell>
-                                    <TableCell className="text-center">{payment.dueDate}</TableCell>
-                                    <TableCell className="text-center">{payment.paidDate}</TableCell>
-                                    <TableCell className="text-center"><Badge className={` text-h ${payment.status === "COMPLETED" ? "bg-green-500/50" : payment.status === "REFUNDED" ? "bg-red-500/50" : payment.status === "PENDING" ? "bg-yellow-500/50" : "bg-blue-500/50"}`}>{payment.status}</Badge></TableCell>
-                                    <TableCell className="flex justify-center gap-2">
-                                        <Button size="icon" variant="outline" onClick={() => navigate(`/admin/payments/${payment.id}`)}>
-                                            <Eye className="h-4 w-4" />
-                                        </Button>
-                                        <Button size="icon" variant="outline" onClick={() => navigate(`/admin/payments/edit/${payment.id}`)}>
-                                            <Pencil className="h-4 w-4" />
-                                        </Button>
-                                        <Button size="icon" variant="destructive">
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                            {payments.length === 0 && <TableRow><TableCell className="text-center py-4" colSpan={6}>Nenhum pagamento encontrado.</TableCell></TableRow>}
-                        </TableBody>
-                    </Table>
-                </div>
-            </div>
-        </div>
-    )
+      <Card>
+        <CardHeader>
+          <CardTitle>Leitura indisponível</CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm text-muted-foreground">
+          Quando o backend expuser uma rota de leitura para pagamentos, esta página pode ser ligada à API da mesma forma que imóveis, visitas e contratos.
+        </CardContent>
+      </Card>
+    </div>
+  );
 }

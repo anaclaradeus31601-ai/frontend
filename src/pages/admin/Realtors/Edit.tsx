@@ -1,27 +1,40 @@
 import { EditForm } from "#components/shared/edit-form";
+import { useUserById } from "#hooks/use-users";
 import { useParams } from "react-router-dom";
+import { UserRole } from "../../../types/database";
 import { editRealtorSchema } from "../../../validations/forms";
 
 export default function EditRealtors() {
   const { id } = useParams();
+  const { data: realtor, isLoading } = useUserById(id);
+
+  if (isLoading) {
+    return <div className="p-6">Carregando corretor...</div>;
+  }
+
+  if (!realtor || realtor.role !== UserRole.REALTOR) {
+    return <div className="p-6">Corretor não encontrado.</div>;
+  }
 
   return (
     <EditForm
+      key={realtor.id}
       schema={editRealtorSchema}
       title="Editar Corretor"
       description={`Atualize o perfil do corretor ${id ? `#${id}` : ""}.`}
       backUrl="/admin/realtors"
-      submitUrl={id ? `/admin/realtors/${id}` : "/admin/realtors"}
+      submitUrl={id ? `/admin/users/${id}` : "/admin/users"}
+      method="PATCH"
       redirectUrl="/admin/realtors"
       submitLabel="Salvar alterações"
       initialValues={{
-        name: "Ana Costa",
-        email: "corretor@email.com",
-        phone: "(11) 99999-9999",
-        cpf: "000.000.000-00",
-        creci: "123456-F",
-        specialty: "sale",
-        bio: "Especialista em imóveis residenciais e atendimento consultivo para primeira compra.",
+        name: realtor.name,
+        email: realtor.email,
+        phone: realtor.phone ?? "",
+        cpf: "",
+        creci: "",
+        specialty: "",
+        bio: "",
       }}
       fields={[
         { name: "name", label: "Nome completo", type: "text", required: true, span: "full" },
@@ -42,6 +55,13 @@ export default function EditRealtors() {
         },
         { name: "bio", label: "Bio", type: "textarea", span: "full" },
       ]}
+      transformPayload={(data: any) => ({
+        name: data.name,
+        email: data.email,
+        phone: data.phone || null,
+        avatar: realtor.avatar ?? null,
+        role: UserRole.REALTOR,
+      })}
     />
   );
 }

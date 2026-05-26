@@ -8,7 +8,7 @@ export default function CreateOwners() {
       title="Criar Proprietário"
       description="Cadastre um novo proprietário para gerenciar imóveis e receber pagamentos."
       backUrl="/admin/owners"
-      submitUrl="/admin/owners"
+      submitUrl="/admin/owner"
       redirectUrl="/admin/owners"
       submitLabel="Salvar proprietário"
       fields={[

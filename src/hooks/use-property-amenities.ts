@@ -7,7 +7,10 @@ import type {
 
 export function usePropertyAmenities(options?: UseCrudResourceOptions) {
   return useCrudResource<PropertyAmenity, CreatePropertyAmenityInput, UpdatePropertyAmenityInput>(
-    "/admin/property-amenities",
-    options,
+    "/propertyamenity",
+    {
+      ...options,
+      writeEndpoint: "/admin/propertyamenity",
+    },
   );
 }

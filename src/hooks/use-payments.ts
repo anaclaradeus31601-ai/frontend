@@ -2,5 +2,5 @@ import { useCrudResource, type UseCrudResourceOptions } from "./use-crud-resourc
 import type { CreatePaymentInput, Payment, UpdatePaymentInput } from "../types/database";
 
 export function usePayments(options?: UseCrudResourceOptions) {
-  return useCrudResource<Payment, CreatePaymentInput, UpdatePaymentInput>("/admin/payments", options);
+  return useCrudResource<Payment, CreatePaymentInput, UpdatePaymentInput>("/admin/payment", options);
 }

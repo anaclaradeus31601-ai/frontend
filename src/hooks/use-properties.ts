@@ -2,5 +2,8 @@ import { useCrudResource, type UseCrudResourceOptions } from "./use-crud-resourc
 import type { CreatePropertyInput, Property, UpdatePropertyInput } from "../types/database";
 
 export function useProperties(options?: UseCrudResourceOptions) {
-  return useCrudResource<Property, CreatePropertyInput, UpdatePropertyInput>("/admin/properties", options);
+  return useCrudResource<Property, CreatePropertyInput, UpdatePropertyInput>("/property", {
+    ...options,
+    writeEndpoint: "/admin/property",
+  });
 }

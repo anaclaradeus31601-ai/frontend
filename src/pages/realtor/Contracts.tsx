@@ -2,51 +2,54 @@ import { Badge } from "#components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "#components/ui/card";
 import { Input } from "#components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "#components/ui/table";
+import { useAuth } from "../../contexts/auth-context";
+import { usePublicContracts, usePropertiesByRealtor } from "../../hooks/use-public-properties";
 import { FileText, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
-const contracts = [
-  {
-    id: "contract-1",
-    client: "Marina Souza",
-    property: "Apartamento Vista Mar",
-    value: "R$ 1.250.000",
-    status: "Em negociação",
-    endDate: "10/08/2026",
-  },
-  {
-    id: "contract-2",
-    client: "Lucas Martins",
-    property: "Casa com Área Gourmet",
-    value: "R$ 890.000",
-    status: "Assinado",
-    endDate: "02/09/2026",
-  },
-  {
-    id: "contract-3",
-    client: "Fernanda Lima",
-    property: "Sala Comercial Central",
-    value: "R$ 4.500/mês",
-    status: "Minuta enviada",
-    endDate: "18/07/2026",
-  },
-];
+function formatCurrency(value?: number | null) {
+  if (value == null) {
+    return "Sob consulta";
+  }
+
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(value);
+}
 
 export default function RealtorContracts() {
+  const { user } = useAuth();
   const [search, setSearch] = useState("");
+  const { data: properties = [] } = usePropertiesByRealtor(user?.id);
+  const { data: contracts = [], isLoading } = usePublicContracts();
+
+  const propertyIds = useMemo(() => new Set(properties.map((property) => property.id)), [properties]);
+
+  const realtorContracts = useMemo(
+    () => contracts.filter((contract) => propertyIds.has(contract.propertyId)),
+    [contracts, propertyIds],
+  );
 
   const filteredContracts = useMemo(() => {
     const term = search.trim().toLowerCase();
 
     if (!term) {
-      return contracts;
+      return realtorContracts;
     }
 
-    return contracts.filter((contract) =>
-      [contract.client, contract.property, contract.status, contract.value]
-        .some((value) => value.toLowerCase().includes(term)),
+    return realtorContracts.filter((contract) =>
+      [
+        contract.client?.name,
+        contract.property?.title,
+        contract.status,
+        contract.saleValue,
+        contract.rentValue,
+      ]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(term)),
     );
-  }, [search]);
+  }, [realtorContracts, search]);
 
   return (
     <div className="p-6 space-y-6">
@@ -68,16 +71,16 @@ export default function RealtorContracts() {
             <CardDescription>Contratos em andamento.</CardDescription>
           </CardHeader>
           <CardContent className="text-3xl font-bold">
-            {contracts.filter((contract) => contract.status !== "Assinado").length}
+            {realtorContracts.filter((contract) => contract.status !== "ACTIVE").length}
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Assinados</CardTitle>
+            <CardTitle>Ativos</CardTitle>
             <CardDescription>Fechados com sucesso.</CardDescription>
           </CardHeader>
           <CardContent className="text-3xl font-bold">
-            {contracts.filter((contract) => contract.status === "Assinado").length}
+            {realtorContracts.filter((contract) => contract.status === "ACTIVE").length}
           </CardContent>
         </Card>
         <Card>
@@ -85,7 +88,7 @@ export default function RealtorContracts() {
             <CardTitle>Carteira ativa</CardTitle>
             <CardDescription>Total acompanhado por você.</CardDescription>
           </CardHeader>
-          <CardContent className="text-3xl font-bold">{contracts.length}</CardContent>
+          <CardContent className="text-3xl font-bold">{realtorContracts.length}</CardContent>
         </Card>
       </div>
 
@@ -101,21 +104,27 @@ export default function RealtorContracts() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredContracts.map((contract) => (
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
+                  Carregando contratos...
+                </TableCell>
+              </TableRow>
+            ) : filteredContracts.map((contract) => (
               <TableRow key={contract.id}>
-                <TableCell className="font-medium">{contract.client}</TableCell>
-                <TableCell>{contract.property}</TableCell>
-                <TableCell>{contract.value}</TableCell>
-                <TableCell>{contract.endDate}</TableCell>
+                <TableCell className="font-medium">{contract.client?.name ?? contract.clientId}</TableCell>
+                <TableCell>{contract.property?.title ?? contract.propertyId}</TableCell>
+                <TableCell>{formatCurrency(contract.saleValue ?? contract.rentValue)}</TableCell>
+                <TableCell>{contract.endDate ?? "Sem prazo"}</TableCell>
                 <TableCell>
-                  <Badge variant={contract.status === "Assinado" ? "default" : "secondary"}>
+                  <Badge variant={contract.status === "ACTIVE" ? "default" : "secondary"}>
                     <FileText className="mr-1 h-3 w-3" />
                     {contract.status}
                   </Badge>
                 </TableCell>
               </TableRow>
             ))}
-            {filteredContracts.length === 0 && (
+            {!isLoading && filteredContracts.length === 0 && (
               <TableRow>
                 <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
                   Nenhum contrato encontrado.

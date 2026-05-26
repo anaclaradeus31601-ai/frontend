@@ -5,6 +5,8 @@ import type { EntityId, QueryParams } from "../types/database";
 export interface UseCrudResourceOptions {
   autoFetch?: boolean;
   initialParams?: QueryParams;
+  readEndpoint?: string;
+  writeEndpoint?: string;
 }
 
 export interface UseCrudResourceResult<TEntity, TCreateInput, TUpdateInput> {
@@ -26,6 +28,8 @@ export function useCrudResource<TEntity extends { id: EntityId }, TCreateInput, 
 ): UseCrudResourceResult<TEntity, TCreateInput, TUpdateInput> {
   const autoFetch = options?.autoFetch;
   const initialParams = options?.initialParams;
+  const readEndpoint = options?.readEndpoint ?? endpoint;
+  const writeEndpoint = options?.writeEndpoint ?? endpoint;
   const [data, setData] = useState<TEntity[]>([]);
   const [loading, setLoading] = useState(Boolean(autoFetch));
   const [submitting, setSubmitting] = useState(false);
@@ -36,7 +40,7 @@ export function useCrudResource<TEntity extends { id: EntityId }, TCreateInput, 
     setError(null);
 
     try {
-      const response = await apiRequest<TEntity[]>(endpoint, undefined, params ?? initialParams);
+      const response = await apiRequest<TEntity[]>(readEndpoint, undefined, params ?? initialParams);
       setData(response);
       return response;
     } catch (caughtError) {
@@ -46,14 +50,14 @@ export function useCrudResource<TEntity extends { id: EntityId }, TCreateInput, 
     } finally {
       setLoading(false);
     }
-  }, [endpoint, initialParams]);
+  }, [initialParams, readEndpoint]);
 
   async function fetchById(id: EntityId) {
     setLoading(true);
     setError(null);
 
     try {
-      return await apiRequest<TEntity>(`${endpoint}/${id}`);
+      return await apiRequest<TEntity>(`${readEndpoint}/${id}`);
     } catch (caughtError) {
       const message = caughtError instanceof Error ? caughtError.message : "Não foi possível carregar o registro.";
       setError(message);
@@ -68,7 +72,7 @@ export function useCrudResource<TEntity extends { id: EntityId }, TCreateInput, 
     setError(null);
 
     try {
-      const created = await apiRequest<TEntity>(endpoint, {
+      const created = await apiRequest<TEntity>(writeEndpoint, {
         method: "POST",
         body: JSON.stringify(payload),
       });
@@ -89,8 +93,8 @@ export function useCrudResource<TEntity extends { id: EntityId }, TCreateInput, 
     setError(null);
 
     try {
-      const updated = await apiRequest<TEntity>(`${endpoint}/${id}`, {
-        method: "PUT",
+      const updated = await apiRequest<TEntity>(`${writeEndpoint}/${id}`, {
+        method: "PATCH",
         body: JSON.stringify(payload),
       });
 
@@ -113,7 +117,7 @@ export function useCrudResource<TEntity extends { id: EntityId }, TCreateInput, 
     setError(null);
 
     try {
-      await apiRequest<void>(`${endpoint}/${id}`, {
+      await apiRequest<void>(`${writeEndpoint}/${id}`, {
         method: "DELETE",
       });
 

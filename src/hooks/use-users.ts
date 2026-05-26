@@ -12,24 +12,36 @@ interface UseCrudResourceOptions {
 // Hook genérico para usuários
 export function useUsers(options?: UseCrudResourceOptions) {
   const fetchUsers = useCallback(async (params?: QueryParams) => {
-    return apiRequest<UserPublicData[]>('/users', {}, {
+    return apiRequest<UserPublicData[]>('/admin/users', {}, {
       ...options?.initialParams,
       ...params,
     });
   }, [options?.initialParams]);
 
   const getUserById = useCallback(async (id: string) => {
-    return apiRequest<UserPublicData>(`/users/${id}`);
+    return apiRequest<UserPublicData>(`/admin/users/${id}`);
   }, []);
 
   return { fetchUsers, getUserById };
+}
+
+export function useUserById(id?: string) {
+  return useQuery({
+    queryKey: ["users", id],
+    queryFn: () => apiRequest<User>(`/admin/users/${id}`),
+    enabled: Boolean(id),
+    staleTime: 5 * 60 * 1000,
+  });
 }
 
 // Hooks específicos por role
 export function useClients(params?: QueryParams) {
   return useQuery({
     queryKey: ["clients", params],
-    queryFn: () => apiRequest<User[]>("/users", {}, { ...params, role: "CLIENT" }),
+    queryFn: async () => {
+      const users = await apiRequest<User[]>("/admin/users", {}, { ...params, role: "CLIENT" });
+      return users.filter((user) => user.role === UserRole.CLIENT);
+    },
     staleTime: 5 * 60 * 1000,
   });
 }
@@ -37,7 +49,10 @@ export function useClients(params?: QueryParams) {
 export function useRealtors(params?: QueryParams) {
   return useQuery({
     queryKey: ["realtors", params],
-    queryFn: () => apiRequest<User[]>("/users", {}, { ...params, role: "REALTOR" }),
+    queryFn: async () => {
+      const users = await apiRequest<User[]>("/admin/users", {}, { ...params, role: "REALTOR" });
+      return users.filter((user) => user.role === UserRole.REALTOR);
+    },
     staleTime: 5 * 60 * 1000,
   });
 }

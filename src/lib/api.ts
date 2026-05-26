@@ -2,19 +2,7 @@
 import type { QueryParams } from "../types/database";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL?.replace(/\/$/, "") ?? "";
-export const ACCESS_TOKEN_KEY = "access_token";
-
-export function getAccessToken() {
-  return localStorage.getItem(ACCESS_TOKEN_KEY);
-}
-
-export function setAccessToken(token: string) {
-  localStorage.setItem(ACCESS_TOKEN_KEY, token);
-}
-
-export function clearAccessToken() {
-  localStorage.removeItem(ACCESS_TOKEN_KEY);
-}
+let refreshRequest: Promise<boolean> | null = null;
 
 function buildQueryString(params?: QueryParams) {
   if (!params) {
@@ -45,21 +33,24 @@ export async function apiRequest<TResponse>(
   init?: RequestInit,
   params?: QueryParams,
 ) {
-  const accessToken = getAccessToken();
-
-  // 👇 Força o envio de cookies em todas as requisições
   const response = await fetch(buildApiUrl(path, params), {
     headers: {
       "Content-Type": "application/json",
-      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       ...init?.headers,
     },
-    credentials: "include", // 👈 ISSO É CRUCIAL para cookies httpOnly
+    credentials: "include",
     ...init,
   });
 
+  if (response.status === 401 && shouldTryRefresh(path, init?.method)) {
+    const refreshed = await refreshSession();
+
+    if (refreshed) {
+      return apiRequest<TResponse>(path, init, params);
+    }
+  }
+
   if (!response.ok) {
-    // Tenta parsear erro como JSON primeiro
     try {
       const errorData = await response.json();
       throw new ApiError(response.status, errorData.message || `Erro na requisição para ${path}.`, errorData);
@@ -79,7 +70,41 @@ export async function apiRequest<TResponse>(
   return (await response.json()) as TResponse;
 }
 
-// 👇 Classe de erro personalizada
+function shouldTryRefresh(path: string, method?: string) {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  const normalizedMethod = (method ?? "GET").toUpperCase();
+
+  if (normalizedPath === "/auth/login" || normalizedPath === "/auth/refresh") {
+    return false;
+  }
+
+  if (normalizedPath === "/auth/logout") {
+    return false;
+  }
+
+  return normalizedMethod !== "OPTIONS";
+}
+
+async function refreshSession() {
+  if (!refreshRequest) {
+    refreshRequest = fetch(buildApiUrl("/auth/refresh"), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({}),
+    })
+      .then((response) => response.ok)
+      .catch(() => false)
+      .finally(() => {
+        refreshRequest = null;
+      });
+  }
+
+  return refreshRequest;
+}
+
 export class ApiError extends Error {
   status: number;
   data?: any;

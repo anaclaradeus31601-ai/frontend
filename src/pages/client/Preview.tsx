@@ -46,7 +46,7 @@ export default function CreateProperty() {
     }
 
     console.log(form);
-    navigate("/show-property");
+    navigate("/");
   }
 
   return (

@@ -49,7 +49,7 @@ export default function CreateContracts() {
       title="Criar Contrato"
       description="Monte um novo contrato com cliente, imóvel, período e valor acordado."
       backUrl="/admin/contracts"
-      submitUrl="/admin/contracts"
+      submitUrl="/admin/contract"
       redirectUrl="/admin/contracts"
       submitLabel="Salvar contrato"
       fields={[

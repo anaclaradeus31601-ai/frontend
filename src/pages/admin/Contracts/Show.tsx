@@ -1,100 +1,50 @@
-
 import { Button } from "#components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "#components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "#components/ui/card";
+import { useContractById } from "../../../hooks/use-public-properties";
 import { ChevronLeft } from "lucide-react";
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom";
+
+function formatCurrency(value?: number | null) {
+  if (value == null) {
+    return "Não informado";
+  }
+
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(value);
+}
+
 export default function ShowContracts() {
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const { data: contract, isLoading, isError } = useContractById(id);
 
-
-    const contracts =[
-        {
-            id: 7,
-            client: "John Doe",
-            docUrl: "https://github.com/shadcn",
-            startDate: "10/01/2025",
-            endDate: "10/01/2026",
-            value: 2500,
-            status: "ACTIVE",
-        },
-        {
-            id: 6,
-            client: "John Doe 2",
-            docUrl: "https://github.com/shadcn",
-            startDate: "10/01/2025",
-            endDate: "10/01/2026",
-            value: 2500,
-            status: "ACTIVE",
-        },
-        {
-            id: 1,
-            client: "John Doe 3",
-            docUrl: "https://github.com/shadcn",
-            startDate: "10/01/2025",
-            endDate: "10/01/2026",
-            value: 2500,
-            status: "ACTIVE",
-        },
-        {
-            id: 2,
-            client: "Maria Silva",
-            docUrl: "https://github.com/shadcn",
-            startDate: "05/02/2025",
-            endDate: "05/12/2025",
-            value: 3200,
-            status: "EXPIRING",
-        },
-
-        {
-            id: 3,
-            client: "Carlos Souza",
-            docUrl: "https://github.com/shadcn",
-            startDate: "12/03/2024",
-            endDate: "12/03/2025",
-            value: 1800,
-            status: "EXPIRED",
-        },
-
-        {
-            id: 4,
-            client: "Ana Clara",
-            docUrl: "https://github.com/shadcn",
-            startDate: "01/04/2025",
-            endDate: "01/04/2026",
-            value: 4100,
-            status: "ACTIVE",
-        },
-
-        {
-            id: 5,
-            client: "Pedro Santos",
-            docUrl: "https://github.com/shadcn",
-            startDate: "15/05/2025",
-            endDate: "15/11/2025",
-            value: 2700,
-            status: "CANCELLED",
-        },
-    ];
-
-    const { id } = useParams<{ id: string }>();
-    const contract = contracts.find(c => c.id == Number(id));
-
-    return (
-        <div className="p-6">
-            <div className="space-y-6">
-                <Button onClick={() => window.history.back()} variant={"ghost"}><ChevronLeft></ChevronLeft></Button>                
-                <Card>
-                    <CardHeader className="flex" >
-                        <CardTitle>Detalhes do contrato: {contract?.client}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p>Documento: <a href={contract?.docUrl} target="_blank">Clique aqui</a></p>
-                        <p>Início: {contract?.startDate}</p>
-                        <p>Fim: {contract?.endDate}</p>
-                        <p>Valor: {contract?.value}</p>
-                        <p>Status: {contract?.status}</p>
-                    </CardContent>
-                </Card>
-            </div>
-        </div>
-    )
+  return (
+    <div className="p-6">
+      <div className="space-y-6">
+        <Button onClick={() => navigate(-1)} variant="ghost"><ChevronLeft className="h-4 w-4" />Voltar</Button>
+        {isLoading ? (
+          <div>Carregando contrato...</div>
+        ) : isError || !contract ? (
+          <div>Contrato não encontrado.</div>
+        ) : (
+          <Card>
+            <CardHeader className="flex">
+              <CardTitle>Detalhes do contrato: {contract.client?.name ?? contract.clientId}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <p><strong>Imóvel:</strong> {contract.property?.title ?? contract.propertyId}</p>
+              <p><strong>Documento:</strong> {contract.documentUrl ? <a href={contract.documentUrl} target="_blank" rel="noreferrer">Clique aqui</a> : "Não informado"}</p>
+              <p><strong>Início:</strong> {contract.startDate}</p>
+              <p><strong>Fim:</strong> {contract.endDate ?? "Sem prazo"}</p>
+              <p><strong>Valor:</strong> {formatCurrency(contract.saleValue ?? contract.rentValue)}</p>
+              <p><strong>Status:</strong> {contract.status}</p>
+              <p><strong>Termos:</strong> {contract.terms}</p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
 }

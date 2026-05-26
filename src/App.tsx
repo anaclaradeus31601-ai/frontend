@@ -8,6 +8,8 @@ import DefaultLayout from "./components/layout/DefaultLayout";
 
 // Páginas públicas
 import Login from "./pages/client/Login";
+import AdminLogin from "./pages/client/AdminLogin";
+import RealtorLogin from "./pages/client/RealtorLogin";
 import Register from "./pages/client/Register";
 import Home from "./pages/client/Home";
 import CreateProperty from "./pages/client/Preview";
@@ -16,7 +18,7 @@ import ShowProperty from "./pages/client/ShowProperty";
 // Páginas Admin
 import AdminHome from "./pages/admin/Home";
 import ShowSettings from "./pages/admin/Configurations/Show";
-// import IndexClients from "./pages/admin/Clients/Index";
+import IndexClients from "./pages/admin/Clients/Index";
 import ShowClients from "./pages/admin/Clients/Show";
 import CreateClients from "./pages/admin/Clients/Create";
 import EditClients from "./pages/admin/Clients/Edit";
@@ -66,12 +68,14 @@ export default function App() {
       <Routes>
         {/* Rotas Públicas */}
         <Route path="/login" element={<Login />} />
+        <Route path="/login/admin" element={<AdminLogin />} />
+        <Route path="/login/corretor" element={<RealtorLogin />} />
         <Route path="/register" element={<Register />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
         
         {/* Páginas públicas de imóveis */}
         <Route path="/preview" element={<CreateProperty />} />
-        <Route path="/show-property" element={<ShowProperty />} />
+        <Route path="/imoveis/:id" element={<ShowProperty />} />
 
         {/* Layout Público (Home, etc) */}
         <Route path="/" element={<DefaultLayout />}>
@@ -82,7 +86,7 @@ export default function App() {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminHome />} />
           <Route path="settings" element={<ShowSettings />} />
-          {/* <Route path="clients" element={<IndexClients />} /> */}
+          <Route path="clients" element={<IndexClients />} />
           <Route path="clients/:id" element={<ShowClients />} />
           <Route path="clients/create" element={<CreateClients />} />
           <Route path="clients/edit/:id" element={<EditClients />} />

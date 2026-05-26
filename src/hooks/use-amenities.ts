@@ -2,5 +2,8 @@ import { useCrudResource, type UseCrudResourceOptions } from "./use-crud-resourc
 import type { Amenity, CreateAmenityInput, UpdateAmenityInput } from "../types/database";
 
 export function useAmenities(options?: UseCrudResourceOptions) {
-  return useCrudResource<Amenity, CreateAmenityInput, UpdateAmenityInput>("/admin/amenities", options);
+  return useCrudResource<Amenity, CreateAmenityInput, UpdateAmenityInput>("/amenity", {
+    ...options,
+    writeEndpoint: "/admin/amenity",
+  });
 }

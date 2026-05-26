@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { apiRequest } from "../../lib/api";
 import  {type RegisterFormData, registerSchema } from "../../validations/forms";
-import { UserRole } from "../../types/database";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -24,29 +23,23 @@ export default function Register() {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      const { confirmPassword: _confirmPassword, phone: _phone, ...registerData } = data;
+      const { confirmPassword: _confirmPassword, ...registerData } = data;
       void _confirmPassword;
-      void _phone;
 
-      await apiRequest("/admin/users", {
+      await apiRequest("/users/register", {
         method: "POST",
         body: JSON.stringify({
           ...registerData,
-          role: UserRole.REALTOR,
         }),
       });
 
       navigate("/login", {
-        state: { message: "Conta de corretor criada com sucesso! Faça login." }
+        state: { message: "Conta criada com sucesso! Faça login." }
       });
     } catch (error: any) {
       if (error.status === 409) {
         setError("email", {
           message: "Este e-mail já está em uso."
-        });
-      } else if (error.status === 401 || error.status === 403) {
-        setError("root", {
-          message: "Esse cadastro exige uma sessão de administrador autenticada."
         });
       } else {
         setError("root", {
@@ -59,9 +52,8 @@ export default function Register() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center mb-2">Criar Conta</h1>
-        <p className="text-gray-500 text-center mb-2">Cria uma conta de corretor</p>
-        <p className="text-gray-400 text-center mb-8 text-sm">Requer uma sessão autenticada de administrador.</p>
+        <h1 className="text-3xl font-bold text-center mb-2 text-gray-900">Criar Conta</h1>
+        <p className="text-gray-500 text-center mb-8">Cadastre-se como cliente</p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-8 rounded-lg shadow-md space-y-4">
           {/* Nome */}
@@ -74,7 +66,7 @@ export default function Register() {
               type="text"
               placeholder="Seu nome"
               {...register("name")}
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+              className={`w-full px-4 py-2 border rounded-lg bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 ${
                 errors.name 
                   ? "border-red-500 focus:ring-red-500" 
                   : "border-gray-300 focus:ring-blue-500"
@@ -95,7 +87,7 @@ export default function Register() {
               type="email"
               placeholder="seu@email.com"
               {...register("email")}
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+              className={`w-full px-4 py-2 border rounded-lg bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 ${
                 errors.email 
                   ? "border-red-500 focus:ring-red-500" 
                   : "border-gray-300 focus:ring-blue-500"
@@ -116,7 +108,7 @@ export default function Register() {
               type="tel"
               placeholder="(11) 99999-9999"
               {...register("phone")}
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+              className={`w-full px-4 py-2 border rounded-lg bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 ${
                 errors.phone 
                   ? "border-red-500 focus:ring-red-500" 
                   : "border-gray-300 focus:ring-blue-500"
@@ -138,7 +130,7 @@ export default function Register() {
                 type={showPassword ? "text" : "password"}
                 placeholder="Mínimo 6 caracteres"
                 {...register("password")}
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 pr-10 ${
+                className={`w-full px-4 py-2 border rounded-lg bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 pr-10 ${
                   errors.password 
                     ? "border-red-500 focus:ring-red-500" 
                     : "border-gray-300 focus:ring-blue-500"
@@ -168,7 +160,7 @@ export default function Register() {
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="Repita a senha"
                 {...register("confirmPassword")}
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 pr-10 ${
+                className={`w-full px-4 py-2 border rounded-lg bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 pr-10 ${
                   errors.confirmPassword 
                     ? "border-red-500 focus:ring-red-500" 
                     : "border-gray-300 focus:ring-blue-500"

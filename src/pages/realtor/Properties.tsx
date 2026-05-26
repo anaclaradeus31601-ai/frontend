@@ -3,56 +3,53 @@ import { Button } from "#components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "#components/ui/card";
 import { Input } from "#components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "#components/ui/table";
+import { useAuth } from "../../contexts/auth-context";
+import { usePropertiesByRealtor } from "../../hooks/use-public-properties";
+import { useVisitsByRealtor } from "../../hooks/use-visit-queries";
 import { CalendarPlus, Eye, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const realtorProperties = [
-  {
-    id: "prop-101",
-    title: "Apartamento Vista Mar",
-    city: "Florianópolis",
-    neighborhood: "Jurerê",
-    price: "R$ 1.250.000",
-    status: "Disponível",
-    visitsThisWeek: 3,
-  },
-  {
-    id: "prop-102",
-    title: "Casa com Área Gourmet",
-    city: "São José",
-    neighborhood: "Campinas",
-    price: "R$ 890.000",
-    status: "Pendente",
-    visitsThisWeek: 1,
-  },
-  {
-    id: "prop-103",
-    title: "Sala Comercial Central",
-    city: "Florianópolis",
-    neighborhood: "Centro",
-    price: "R$ 4.500/mês",
-    status: "Disponível",
-    visitsThisWeek: 2,
-  },
-];
+function formatPrice(rentPrice?: number | null, salePrice?: number | null) {
+  const price = salePrice ?? rentPrice;
+
+  if (price == null) {
+    return "Sob consulta";
+  }
+
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(price);
+}
 
 export default function RealtorProperties() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [search, setSearch] = useState("");
+  const { data: properties = [], isLoading } = usePropertiesByRealtor(user?.id);
+  const { data: visits = [] } = useVisitsByRealtor(user?.id);
+
+  const visitsByProperty = useMemo(
+    () => visits.reduce<Record<string, number>>((acc, visit) => {
+      acc[visit.propertyId] = (acc[visit.propertyId] ?? 0) + 1;
+      return acc;
+    }, {}),
+    [visits],
+  );
 
   const filteredProperties = useMemo(() => {
     const term = search.trim().toLowerCase();
 
     if (!term) {
-      return realtorProperties;
+      return properties;
     }
 
-    return realtorProperties.filter((property) =>
+    return properties.filter((property) =>
       [property.title, property.city, property.neighborhood, property.status]
         .some((value) => value.toLowerCase().includes(term)),
     );
-  }, [search]);
+  }, [properties, search]);
 
   return (
     <div className="p-6 space-y-6">
@@ -75,7 +72,7 @@ export default function RealtorProperties() {
             <CardTitle>Imóveis ativos</CardTitle>
             <CardDescription>Itens sob sua responsabilidade.</CardDescription>
           </CardHeader>
-          <CardContent className="text-3xl font-bold">{realtorProperties.length}</CardContent>
+          <CardContent className="text-3xl font-bold">{properties.length}</CardContent>
         </Card>
         <Card>
           <CardHeader>
@@ -83,7 +80,7 @@ export default function RealtorProperties() {
             <CardDescription>Prontos para novas negociações.</CardDescription>
           </CardHeader>
           <CardContent className="text-3xl font-bold">
-            {realtorProperties.filter((property) => property.status === "Disponível").length}
+            {properties.filter((property) => property.status === "AVAILABLE").length}
           </CardContent>
         </Card>
         <Card>
@@ -91,9 +88,7 @@ export default function RealtorProperties() {
             <CardTitle>Visitas na semana</CardTitle>
             <CardDescription>Total agendado nesses imóveis.</CardDescription>
           </CardHeader>
-          <CardContent className="text-3xl font-bold">
-            {realtorProperties.reduce((total, property) => total + property.visitsThisWeek, 0)}
-          </CardContent>
+          <CardContent className="text-3xl font-bold">{visits.length}</CardContent>
         </Card>
       </div>
 
@@ -110,18 +105,24 @@ export default function RealtorProperties() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredProperties.map((property) => (
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
+                  Carregando imóveis...
+                </TableCell>
+              </TableRow>
+            ) : filteredProperties.map((property) => (
               <TableRow key={property.id}>
                 <TableCell className="font-medium">{property.title}</TableCell>
                 <TableCell>{property.city} - {property.neighborhood}</TableCell>
-                <TableCell>{property.price}</TableCell>
+                <TableCell>{formatPrice(property.rentPrice, property.salePrice)}</TableCell>
                 <TableCell>
-                  <Badge variant={property.status === "Disponível" ? "default" : "secondary"}>{property.status}</Badge>
+                  <Badge variant={property.status === "AVAILABLE" ? "default" : "secondary"}>{property.status}</Badge>
                 </TableCell>
-                <TableCell>{property.visitsThisWeek}</TableCell>
+                <TableCell>{visitsByProperty[property.id] ?? 0}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Button variant="outline" size="icon" onClick={() => navigate("/show-property")}>
+                    <Button variant="outline" size="icon" onClick={() => navigate(`/imoveis/${property.id}`)}>
                       <Eye className="h-4 w-4" />
                     </Button>
                     <Button onClick={() => navigate("/realtor/visits/create")}>
@@ -132,7 +133,7 @@ export default function RealtorProperties() {
                 </TableCell>
               </TableRow>
             ))}
-            {filteredProperties.length === 0 && (
+            {!isLoading && filteredProperties.length === 0 && (
               <TableRow>
                 <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
                   Nenhum imóvel encontrado.

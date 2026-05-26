@@ -5,22 +5,36 @@ import {
   MapPin,
   Heart,
   Share2,
+  Ruler,
 } from "lucide-react";
+import { useParams } from "react-router-dom";
+import { usePropertyById } from "../../hooks/use-public-properties";
+
+function formatPrice(value?: number | null) {
+  if (value == null) {
+    return "Sob consulta";
+  }
+
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(value);
+}
 
 export default function ShowProperties() {
-  const property = {
-    title: "Casa moderna com piscina",
-    city: "São Paulo",
-    neighborhood: "Alphaville",
-    price: "R$ 450.000",
-    bedrooms: 4,
-    bathrooms: 3,
-    garages: 2,
-    description:
-      "Casa moderna de alto padrão com piscina, área gourmet e acabamento premium. Localizada em condomínio fechado.",
-    image:
-      "https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1600&auto=format&fit=crop",
-  };
+  const { id } = useParams();
+  const { data: property, isLoading, isError } = usePropertyById(id);
+
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center">Carregando imóvel...</div>;
+  }
+
+  if (isError || !property) {
+    return <div className="min-h-screen flex items-center justify-center">Imóvel não encontrado.</div>;
+  }
+
+  const image = property.images[0] || "https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1600&auto=format&fit=crop";
+  const price = property.transactionType === "RENT" ? property.rentPrice : property.salePrice;
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
@@ -35,7 +49,7 @@ export default function ShowProperties() {
       {/* Hero Image */}
       <div className="w-full h-75 md:h-125 overflow-hidden">
         <img
-          src={property.image}
+          src={image}
           alt={property.title}
           className="w-full h-full object-cover"
         />
@@ -174,11 +188,34 @@ export default function ShowProperties() {
                 <Car className="w-5 h-5 mb-2 text-zinc-300" />
 
                 <span className="text-lg font-semibold">
-                  {property.garages}
+                  {property.garages ?? 0}
                 </span>
 
                 <p className="text-xs text-zinc-400">
                   Garagens
+                </p>
+              </div>
+              <div
+                className="
+                  rounded-2xl
+                  border
+                  border-white/10
+                  bg-white/5
+                  p-4
+                  flex
+                  flex-col
+                  items-center
+                  justify-center
+                "
+              >
+                <Ruler className="w-5 h-5 mb-2 text-zinc-300" />
+
+                <span className="text-lg font-semibold">
+                  {property.area}
+                </span>
+
+                <p className="text-xs text-zinc-400">
+                  m2
                 </p>
               </div>
             </div>
@@ -225,7 +262,7 @@ export default function ShowProperties() {
               </p>
 
               <h2 className="text-3xl font-bold mt-1">
-                {property.price}
+                {formatPrice(price)}
               </h2>
 
               <button

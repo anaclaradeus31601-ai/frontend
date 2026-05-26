@@ -2,5 +2,8 @@ import { useCrudResource, type UseCrudResourceOptions } from "./use-crud-resourc
 import type { CreateOwnerInput, Owner, UpdateOwnerInput } from "../types/database";
 
 export function useOwners(options?: UseCrudResourceOptions) {
-  return useCrudResource<Owner, CreateOwnerInput, UpdateOwnerInput>("/admin/owners", options);
+  return useCrudResource<Owner, CreateOwnerInput, UpdateOwnerInput>("/owner", {
+    ...options,
+    writeEndpoint: "/admin/owner",
+  });
 }

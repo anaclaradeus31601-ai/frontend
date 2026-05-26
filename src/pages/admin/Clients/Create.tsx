@@ -9,26 +9,17 @@ export default function CreateClients() {
       title="Criar Cliente"
       description="Cadastre um novo cliente de acordo com os campos da tabela User."
       backUrl="/admin/clients"
-      submitUrl="/admin/clients"
+      submitUrl="/admin/users"
       redirectUrl="/admin/clients"
       submitLabel="Salvar cliente"
+      initialValues={{
+        role: UserRole.CLIENT,
+      }}
       fields={[
         { name: "name", label: "Nome", type: "text", placeholder: "João da Silva", required: true },
         { name: "email", label: "E-mail", type: "email", placeholder: "cliente@email.com", required: true },
         { name: "password", label: "Senha", type: "password", placeholder: "Senha inicial", required: true },
         { name: "phone", label: "Telefone", type: "tel", placeholder: "(11) 99999-9999" },
-        {
-          name: "role",
-          label: "Role",
-          type: "select",
-          required: true,
-          defaultValue: UserRole.CLIENT,
-          options: [
-            { value: UserRole.CLIENT, label: "Cliente" },
-            { value: UserRole.REALTOR, label: "Corretor" },
-            { value: UserRole.ADMIN, label: "Administrador" },
-          ],
-        },
         {
           name: "emailVerified",
           label: "E-mail verificado",
@@ -42,6 +33,7 @@ export default function CreateClients() {
       ]}
       transformPayload={(data: CreateClientFormData) => ({
         ...data,
+        role: UserRole.CLIENT,
         phone: data.phone || null,
         avatar: data.avatar || null,
         emailVerified:

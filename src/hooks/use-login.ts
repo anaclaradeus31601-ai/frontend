@@ -1,35 +1,39 @@
 // hooks/use-login.ts
 import { useCallback, useState } from 'react';
 import { useAuth } from '../contexts/auth-context';
-import { apiRequest, clearAccessToken, setAccessToken } from '../lib/api';
-import type { UserPublicData } from '../types/database';
+import { ApiError, apiRequest } from '../lib/api';
+import type { UserPublicData, UserRole } from '../types/database';
 
 interface LoginCredentials {
   email: string;
   password: string;
 }
 
-interface AuthResponse {
-  access_token: string;
-  refresh_token: string;
+interface LoginOptions {
+  expectedRole?: UserRole;
 }
 
 export function useLogin() {
   const { user: currentUser, setUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
-  const login = useCallback(async (credentials: LoginCredentials) => {
+  const login = useCallback(async (credentials: LoginCredentials, options?: LoginOptions) => {
     setIsLoading(true);
     
     try {
-      const data = await apiRequest<AuthResponse>('/auth/login', {
+      await apiRequest('/auth/login', {
         method: 'POST',
         body: JSON.stringify(credentials),
       });
 
-      setAccessToken(data.access_token);
-
       const user = await apiRequest<UserPublicData>('/users/me');
+
+      if (options?.expectedRole && user.role !== options.expectedRole) {
+        await apiRequest('/auth/logout', { method: 'POST' }).catch(() => undefined);
+        setUser(null);
+        throw new ApiError(403, `Esta área é exclusiva para ${describeRole(options.expectedRole)}.`);
+      }
+
       setUser(user);
 
       const redirectMap = {
@@ -40,7 +44,6 @@ export function useLogin() {
 
       window.location.href = redirectMap[user.role] || '/';
     } catch (error) {
-      clearAccessToken();
       console.error('Login failed:', error);
       throw error;
     } finally {
@@ -52,14 +55,23 @@ export function useLogin() {
     try {
       await apiRequest('/auth/logout', { method: 'POST' });
     } catch (error) {
-      // Mesmo se falhar, faz logout local
       console.error('Logout error:', error);
     } finally {
-      clearAccessToken();
       setUser(null);
       window.location.href = '/login';
     }
   }, [setUser]);
 
   return { login, logout, currentUser, isLoading };
+}
+
+function describeRole(role: UserRole) {
+  switch (role) {
+    case "ADMIN":
+      return "administradores";
+    case "REALTOR":
+      return "corretores";
+    default:
+      return "clientes";
+  }
 }

@@ -65,7 +65,7 @@ export default function CreatePayments() {
       title="Criar Pagamento"
       description="Registre um novo pagamento vinculado ao cliente e contrato correspondente."
       backUrl="/admin/payments"
-      submitUrl="/admin/payments"
+      submitUrl="/admin/payment"
       redirectUrl="/admin/payments"
       submitLabel="Salvar pagamento"
       fields={[

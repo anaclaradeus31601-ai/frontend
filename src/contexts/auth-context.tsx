@@ -8,7 +8,7 @@ import {
   useCallback 
 } from "react";
 import type { UserRole, UserPublicData } from "../types/database";
-import { apiRequest, clearAccessToken, getAccessToken } from "../lib/api";
+import { apiRequest } from "../lib/api";
 
 interface AuthContextType {
   user: UserPublicData | null;
@@ -25,22 +25,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserPublicData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Verifica sessão no backend ao carregar
   useEffect(() => {
     const checkSession = async () => {
-      const accessToken = getAccessToken();
-
-      if (!accessToken) {
-        setUser(null);
-        setLoading(false);
-        return;
-      }
-
       try {
         const data = await apiRequest<UserPublicData>('/users/me');
         setUser(data);
       } catch {
-        clearAccessToken();
         setUser(null);
       } finally {
         setLoading(false);
@@ -62,7 +52,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      clearAccessToken();
       setUser(null);
     }
   }, []);

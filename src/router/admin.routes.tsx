@@ -2,6 +2,7 @@ import type { RouteObject } from "react-router-dom"
 import CreateClients from "../pages/admin/Clients/Create"
 import EditClients from "../pages/admin/Clients/Edit"
 import ShowClients from "../pages/admin/Clients/Show"
+import IndexClients from "../pages/admin/Clients/Index"
 import AdminHome from "../pages/admin/Home"
 import CreateOwners from "../pages/admin/Owners/Create"
 import ShowOwners from "../pages/admin/Owners/Show"
@@ -54,7 +55,7 @@ export const AdminRoutes: RouteObject[] = [
     // clients
     {
       path: "clients",
-      element: <ShowClients />,
+      element: <IndexClients />,
     },
     {
       path: "clients/:id",

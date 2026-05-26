@@ -7,7 +7,7 @@ export interface EditFormProps<T extends FieldValues> extends Omit<ResourceFormP
 
 export function EditForm<T extends FieldValues>({
   submitLabel = "Salvar alterações",
-  method = "PUT",
+  method = "PATCH",
   ...props
 }: EditFormProps<T>) {
   return <ResourceForm {...props} submitLabel={submitLabel} method={method} />;

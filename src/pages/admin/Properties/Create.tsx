@@ -50,7 +50,7 @@ export default function CreateProperties() {
             title="Criar Imóvel"
             description="Preencha os dados do imóvel com endereço, valores e características."
             backUrl="/admin/properties"
-            submitUrl="/admin/properties"
+            submitUrl="/admin/property"
             redirectUrl="/admin/properties"
             submitLabel="Salvar imóvel"
             transformPayload={(data: CreatePropertyFormData) => ({

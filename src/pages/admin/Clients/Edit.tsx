@@ -1,28 +1,41 @@
 import { EditForm } from "#components/shared/edit-form";
+import { useUserById } from "#hooks/use-users";
 import { useParams } from "react-router-dom";
+import { UserRole } from "../../../types/database";
 import { editClientSchema } from "../../../validations/forms";
 
 export default function EditClients() {
   const { id } = useParams();
+  const { data: client, isLoading } = useUserById(id);
+
+  if (isLoading) {
+    return <div className="p-6">Carregando cliente...</div>;
+  }
+
+  if (!client || client.role !== UserRole.CLIENT) {
+    return <div className="p-6">Cliente não encontrado.</div>;
+  }
 
   return (
     <EditForm
+      key={client.id}
       schema={editClientSchema}
       title="Editar Cliente"
       description={`Atualize os dados do cliente ${id ? `#${id}` : ""}.`}
       backUrl="/admin/clients"
-      submitUrl={id ? `/admin/clients/${id}` : "/admin/clients"}
+      submitUrl={id ? `/admin/users/${id}` : "/admin/users"}
+      method="PATCH"
       redirectUrl="/admin/clients"
       submitLabel="Salvar alterações"
       initialValues={{
-        name: "João da Silva",
-        cpf: "000.000.000-00",
-        birthDate: "1990-01-01",
-        email: "cliente@email.com",
-        phone: "(11) 99999-9999",
-        budget: "R$ 350.000,00",
-        city: "Florianópolis",
-        notes: "Cliente com urgência de mudança e preferência por região central.",
+        name: client.name,
+        email: client.email,
+        phone: client.phone ?? "",
+        cpf: "",
+        birthDate: "",
+        budget: "",
+        city: "",
+        notes: "",
       }}
       fields={[
         { name: "name", label: "Nome completo", type: "text", required: true, span: "full" },
@@ -34,6 +47,12 @@ export default function EditClients() {
         { name: "city", label: "Cidade de interesse", type: "text" },
         { name: "notes", label: "Observações", type: "textarea", span: "full" },
       ]}
+      transformPayload={(data: any) => ({
+        name: data.name,
+        email: data.email,
+        phone: data.phone || null,
+        role: UserRole.CLIENT,
+      })}
     />
   );
 }
