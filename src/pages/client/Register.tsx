@@ -128,7 +128,7 @@ export default function Register() {
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="Mínimo 6 caracteres"
+                placeholder="Use maiúscula, minúscula, número e símbolo"
                 {...register("password")}
                 className={`w-full px-4 py-2 border rounded-lg bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 pr-10 ${
                   errors.password 

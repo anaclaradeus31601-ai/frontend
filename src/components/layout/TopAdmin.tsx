@@ -1,7 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "#components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "#components/ui/dropdown-menu";
 import {
-    Bell,
     ChevronDown,
     LogOut,
     Search,
@@ -9,11 +8,16 @@ import {
     User,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../contexts/auth-context";
+import { useNavigate } from "react-router-dom";
+import NotificationDropdown from "./NotificationDropdown";
 
 
 const button = "h-10 w-10 rounded-full bg-muted flex items-center justify-center hover:bg-accent transition-colors";
 
 export default function TopAdmin() {
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
     const formattedDate = new Date().toLocaleDateString("pt-BR", {
         weekday: "long",
         day: "numeric",
@@ -45,13 +49,11 @@ export default function TopAdmin() {
 
             {/* Right */}
             <div className="items-center gap-2 hidden md:flex lg:flex">
-                <Link to="/settings" className={button}>
+                <Link to="/admin/settings" className={button}>
                     <Settings className="h-5 w-5" />
                 </Link>
 
-                <Link to="/notifications" className={button}>
-                    <Bell className="h-5 w-5" />
-                </Link>
+                <NotificationDropdown buttonClassName={button} viewAllHref="/admin/notifications" />
 
                 {/* User Menu */}
                 <DropdownMenu>
@@ -64,17 +66,17 @@ export default function TopAdmin() {
                         >
                             {/* avatar */}
                             <Avatar className="w-10 h-10">
-                                <AvatarImage src="https://github.com/shadcn.png" />
-                                <AvatarFallback>JD</AvatarFallback>
+                                <AvatarImage src={user?.avatar ?? "https://github.com/shadcn.png"} />
+                                <AvatarFallback>{user?.name?.slice(0, 2).toUpperCase() ?? "AD"}</AvatarFallback>
                             </Avatar>
 
                             <div className="hidden md:flex flex-col items-start">
                                 <span className="text-sm font-medium">
-                                    John Doe
+                                    {user?.name ?? "Administrador"}
                                 </span>
 
                                 <span className="text-xs text-muted-foreground">
-                                    Admin
+                                    {user?.role ?? "ADMIN"}
                                 </span>
                             </div>
 
@@ -93,14 +95,14 @@ export default function TopAdmin() {
                         <DropdownMenuSeparator />
 
                         <DropdownMenuItem asChild>
-                            <Link to="/profile">
+                            <Link to="/admin/profile">
                                 <User className="mr-2 h-4 w-4" />
                                 Perfil
                             </Link>
                         </DropdownMenuItem>
 
                         <DropdownMenuItem asChild>
-                            <Link to="/settings">
+                            <Link to="/admin/settings">
                                 <Settings className="mr-2 h-4 w-4" />
                                 Configurações
                             </Link>
@@ -108,7 +110,13 @@ export default function TopAdmin() {
 
                         <DropdownMenuSeparator />
 
-                        <DropdownMenuItem className="text-red-500 focus:text-red-500">
+                        <DropdownMenuItem
+                            className="text-red-500 focus:text-red-500"
+                            onClick={async () => {
+                                await logout();
+                                navigate("/login/admin");
+                            }}
+                        >
                             <LogOut className="mr-2 h-4 w-4" />
                             Sair
                         </DropdownMenuItem>

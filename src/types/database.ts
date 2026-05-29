@@ -88,6 +88,10 @@ export interface UserPublicData {
   name: string;
   email: string;
   phone?: string | null;
+  birthDate?: string | null;
+  budget?: string | null;
+  city?: string | null;
+  notes?: string | null;
   role: UserRole;
   avatar?: string | null;
 }
@@ -183,6 +187,7 @@ export interface Property {
   // Metadados
   featured: boolean;
   views: number;
+  isFavorite?: boolean;
   
   // Relacionamentos
   ownerId: string;
@@ -247,6 +252,88 @@ export interface Payment {
   // Relacionamentos
   contract?: Contract;
   user?: User;
+}
+
+export interface Favorite {
+  id: EntityId;
+  userId: EntityId;
+  propertyId: EntityId;
+  createdAt: string;
+  property: Property;
+}
+
+export interface Notification {
+  id: EntityId;
+  userId: EntityId;
+  type: string;
+  title: string;
+  message: string;
+  data?: Record<string, unknown> | null;
+  readAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const ConversationStatus = {
+  OPEN: "OPEN",
+  ARCHIVED: "ARCHIVED",
+} as const;
+
+export type ConversationStatus = (typeof ConversationStatus)[keyof typeof ConversationStatus];
+
+export interface ChatConversation {
+  id: EntityId;
+  clientId: EntityId;
+  realtorId: EntityId;
+  createdById: EntityId;
+  propertyId?: EntityId | null;
+  status: ConversationStatus;
+  lastMessageAt?: string | null;
+  lastMessagePreview?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  client: UserPublicData;
+  realtor: UserPublicData;
+  property?: Pick<Property, "id" | "title"> | null;
+  messages?: ChatMessagePreview[];
+}
+
+export interface ChatMessagePreview {
+  id: EntityId;
+  content: string;
+  senderId: EntityId;
+  createdAt: string;
+  isRead: boolean;
+}
+
+export interface ChatMessage {
+  id: EntityId;
+  conversationId: EntityId;
+  senderId: EntityId;
+  content: string;
+  isRead: boolean;
+  readAt?: string | null;
+  editedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  sender: UserPublicData;
+}
+
+export interface AuditLog {
+  id: EntityId;
+  actorId?: EntityId | null;
+  actorName: string;
+  actorEmail: string;
+  actorRole: UserRole;
+  action: string;
+  resource: string;
+  resourceId?: string | null;
+  method: string;
+  path: string;
+  responseStatus: number;
+  ip?: string | null;
+  userAgent?: string | null;
+  createdAt: string;
 }
 
 // ============ INPUT TYPES ============

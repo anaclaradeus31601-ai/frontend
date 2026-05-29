@@ -8,12 +8,18 @@ import DefaultLayout from "./components/layout/DefaultLayout";
 
 // Páginas públicas
 import Login from "./pages/client/Login";
-import AdminLogin from "./pages/client/AdminLogin";
-import RealtorLogin from "./pages/client/RealtorLogin";
+import AdminLogin from "./pages/admin/AdminLogin";
+import RealtorLogin from "./pages/realtor/RealtorLogin";
 import Register from "./pages/client/Register";
 import Home from "./pages/client/Home";
 import CreateProperty from "./pages/client/Preview";
 import ShowProperty from "./pages/client/ShowProperty";
+import PropertiesCatalog from "./pages/client/Properties";
+import About from "./pages/client/About";
+import Services from "./pages/client/Services";
+import Contact from "./pages/client/Contact";
+import Owner from "./pages/client/Owner";
+import MyProperties from "./pages/client/MyProperties";
 
 // Páginas Admin
 import AdminHome from "./pages/admin/Home";
@@ -47,6 +53,10 @@ import ShowContracts from "./pages/admin/Contracts/Show";
 import CreateContracts from "./pages/admin/Contracts/Create";
 import EditContracts from "./pages/admin/Contracts/Edit";
 import Analytics from "./pages/admin/Analytics/Analytics";
+import AdminNotifications from "./pages/admin/Notifications";
+import AdminProfile from "./pages/admin/Profile";
+import Medias from "./pages/admin/Medias/Media";
+import AuditPage from "./pages/admin/Audit";
 
 // Páginas Realtor
 import RealtorHome from "./pages/realtor/Home";
@@ -55,12 +65,23 @@ import RealtorVisits from "./pages/realtor/Visits";
 import RealtorCreateVisit from "./pages/realtor/CreateVisit";
 import RealtorEditVisit from "./pages/realtor/EditVisit";
 import RealtorContracts from "./pages/realtor/Contracts";
+import RealtorChat from "./pages/realtor/Chat";
 import RealtorProfile from "./pages/realtor/Profile";
 import RealtorSettings from "./pages/realtor/Settings";
+import RealtorNotifications from "./pages/realtor/Notifications";
 
 // Páginas de erro
 import Unauthorized from "./pages/errors/Unauthorized";
 import NotFound from "./pages/errors/NotFound";
+import FavoritesProperties from "./pages/client/Favorites";
+import Profile from "./pages/client/Profile";
+import ForgotPassword from "./pages/client/ForgotPassword";
+import ConfirmEmailVerification from "./pages/client/ConfirmEmailVerification";
+import ResetPassword from "./pages/client/ResetPassword";
+import RequestEmailVerification from "./pages/client/RequestEmailVerification";
+import ClientChat from "./pages/client/Chat";
+import { ProtectedRoute } from "./components/protected-route";
+import { UserRole } from "./types/database";
 
 export default function App() {
   return (
@@ -74,18 +95,55 @@ export default function App() {
         <Route path="/unauthorized" element={<Unauthorized />} />
         
         {/* Páginas públicas de imóveis */}
-        <Route path="/preview" element={<CreateProperty />} />
-        <Route path="/imoveis/:id" element={<ShowProperty />} />
+        
 
         {/* Layout Público (Home, etc) */}
         <Route path="/" element={<DefaultLayout />}>
           <Route index element={<Home />} />
+          <Route path="/properties" element={<PropertiesCatalog />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/preview" element={<CreateProperty />} />
+          <Route path="/owner" element={<Owner />} />
+          <Route path="/imoveis/:id" element={<ShowProperty />} />
+          <Route path="/favoritos" element={<FavoritesProperties />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/my-properties" element={<MyProperties />} />
+          <Route
+            path="/chat"
+            element={
+              <ProtectedRoute requiredRoles={UserRole.CLIENT}>
+                <ClientChat />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/chat/:conversationId"
+            element={
+              <ProtectedRoute requiredRoles={UserRole.CLIENT}>
+                <ClientChat />
+              </ProtectedRoute>
+            }
+          />
+          {/* rotas de esqueci senha e confirmar email resetar senha */}
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/verify-email/request" element={<RequestEmailVerification />} />
+          <Route path="/verify-email/confirm" element={<ConfirmEmailVerification />} />
+          <Route path="/verify-email/:email" element={<ConfirmEmailVerification />} />
+          <Route path="/reset-password" element={<ResetPassword/>} />
+          <Route path="/reset-password/:token" element={<ResetPassword/>} />
+
         </Route>
 
         {/* Admin Routes - Layout já faz verificação */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminHome />} />
           <Route path="settings" element={<ShowSettings />} />
+          <Route path="profile" element={<AdminProfile />} />
+          <Route path="notifications" element={<AdminNotifications />} />
+          <Route path="media" element={<Medias />} />
+          <Route path="audit" element={<AuditPage />} />
           <Route path="clients" element={<IndexClients />} />
           <Route path="clients/:id" element={<ShowClients />} />
           <Route path="clients/create" element={<CreateClients />} />
@@ -125,8 +183,11 @@ export default function App() {
           <Route path="visits/create" element={<RealtorCreateVisit />} />
           <Route path="visits/edit/:id" element={<RealtorEditVisit />} />
           <Route path="contracts" element={<RealtorContracts />} />
+          <Route path="chat" element={<RealtorChat />} />
+          <Route path="chat/:conversationId" element={<RealtorChat />} />
           <Route path="profile" element={<RealtorProfile />} />
           <Route path="settings" element={<RealtorSettings />} />
+          <Route path="notifications" element={<RealtorNotifications />} />
         </Route>
 
         {/* 404 */}

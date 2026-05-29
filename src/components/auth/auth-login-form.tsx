@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,6 +23,7 @@ export function AuthLoginForm({
   expectedRole,
   registerLink = false,
 }: AuthLoginFormProps) {
+  const location = useLocation();
   const { login, isLoading } = useLogin();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -68,6 +69,12 @@ export function AuthLoginForm({
         <p className="text-gray-500 text-center mb-8">{subtitle}</p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-8 rounded-lg shadow-md space-y-4">
+          {location.state?.message && (
+            <div className="rounded-lg bg-emerald-50 p-3 text-sm text-emerald-700">
+              {location.state.message as string}
+            </div>
+          )}
+
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
               Email
@@ -123,13 +130,33 @@ export function AuthLoginForm({
             {isSubmitting || isLoading ? "Entrando..." : "Entrar"}
           </button>
 
+          <div className="text-right">
+            <Link
+              to="/forgot-password"
+              className="text-sm font-medium text-blue-600 hover:text-blue-700"
+            >
+              Esqueci minha senha
+            </Link>
+          </div>
+
           {registerLink && (
-            <p className="text-center text-sm text-gray-600">
-              Não tem conta?{" "}
-              <Link to="/register" className="text-blue-600 hover:text-blue-700 font-medium">
-                Criar conta
-              </Link>
-            </p>
+            <div className="space-y-2 text-center text-sm text-gray-600">
+              <p>
+                Não tem conta?{" "}
+                <Link to="/register" className="font-medium text-blue-600 hover:text-blue-700">
+                  Criar conta
+                </Link>
+              </p>
+              <p>
+                Precisa confirmar seu e-mail?{" "}
+                <Link
+                  to="/verify-email/request"
+                  className="font-medium text-blue-600 hover:text-blue-700"
+                >
+                  Reenviar confirmação
+                </Link>
+              </p>
+            </div>
           )}
         </form>
       </div>

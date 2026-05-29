@@ -1,6 +1,7 @@
 import { Badge } from "#components/ui/badge";
 import { Button } from "#components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "#components/ui/card";
+import { VisitCalendar } from "#components/visits/visit-calendar";
 import { Input } from "#components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "#components/ui/table";
 import { CalendarPlus, Pencil, Search } from "lucide-react";
@@ -50,8 +51,8 @@ export default function RealtorVisits() {
     () =>
       visits.map((visit) => ({
         id: visit.id,
-        property: propertyMap.get(visit.propertyId) ?? visit.propertyId,
-        client: visit.clientId,
+        property: propertyMap.get(visit.propertyId) ?? visit.property?.title ?? "Imóvel não informado",
+        client: visit.client?.name ?? "Cliente não informado",
         scheduledAt: formatScheduledAt(visit.scheduledAt),
         status: mapVisitStatus(visit.status),
       })),
@@ -121,6 +122,19 @@ export default function RealtorVisits() {
           </CardContent>
         </Card>
       </div>
+
+      <VisitCalendar
+        visits={visits}
+        title="Calendário das minhas visitas"
+        emptyMessage="Nenhuma visita marcada para esta data."
+        renderMeta={(visit) => visit.client?.name ?? "Cliente não informado"}
+        renderActions={(visit) => (
+          <Button variant="outline" onClick={() => navigate(`/realtor/visits/edit/${visit.id}`)}>
+            <Pencil className="mr-2 h-4 w-4" />
+            Editar
+          </Button>
+        )}
+      />
 
       <div className="overflow-x-auto rounded-2xl border">
         <Table>

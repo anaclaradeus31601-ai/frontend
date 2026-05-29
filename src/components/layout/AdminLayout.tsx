@@ -25,12 +25,12 @@ export default function AdminLayout() {
   }
 
   return (
-    <div className="flex h-screen w-screen">
+    <div className="flex min-h-screen max-w-full overflow-x-hidden bg-background">
       <AdminHeader />
-      <main className="flex-1 bg-background  overflow-y-auto">
+      <main className="min-w-0 flex-1 overflow-y-auto overflow-x-hidden bg-background">
         <TopAdmin />
         <Outlet />
       </main>
     </div>
-  )
+  );
 }

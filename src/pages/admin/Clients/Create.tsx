@@ -20,6 +20,10 @@ export default function CreateClients() {
         { name: "email", label: "E-mail", type: "email", placeholder: "cliente@email.com", required: true },
         { name: "password", label: "Senha", type: "password", placeholder: "Senha inicial", required: true },
         { name: "phone", label: "Telefone", type: "tel", placeholder: "(11) 99999-9999" },
+        { name: "birthDate", label: "Data de nascimento", type: "date" },
+        { name: "budget", label: "Faixa de orçamento", type: "text", placeholder: "R$ 350.000,00" },
+        { name: "city", label: "Cidade de interesse", type: "text", placeholder: "Florianópolis" },
+        { name: "notes", label: "Observações", type: "textarea", span: "full" },
         {
           name: "emailVerified",
           label: "E-mail verificado",
@@ -35,6 +39,10 @@ export default function CreateClients() {
         ...data,
         role: UserRole.CLIENT,
         phone: data.phone || null,
+        birthDate: data.birthDate || null,
+        budget: data.budget || null,
+        city: data.city || null,
+        notes: data.notes || null,
         avatar: data.avatar || null,
         emailVerified:
           typeof data.emailVerified === "boolean"

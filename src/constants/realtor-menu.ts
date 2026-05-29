@@ -3,6 +3,7 @@ import {
   Clipboard,
   Home,
   LayoutDashboardIcon,
+  MessageCircleMore,
   Settings,
   UserCircle,
   type LucideIcon,
@@ -34,6 +35,11 @@ export const realtorMenuItems: MenuItem[] = [
     label: "Contratos",
     icon: Clipboard,
     href: "/realtor/contracts",
+  },
+  {
+    label: "Mensagens",
+    icon: MessageCircleMore,
+    href: "/realtor/chat",
   },
 ];
 

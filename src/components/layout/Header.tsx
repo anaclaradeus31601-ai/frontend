@@ -1,90 +1,164 @@
-import { Menu } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Heart, Menu, MessageCircleMore, X } from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "#components/ui/button";
-// import Pesquisa from "./Pesquisa";
+import { useAuth } from "../../contexts/auth-context";
+import NotificationDropdown from "./NotificationDropdown";
 
 export default function Header() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
-    const linkActive = "text-text-primary font-medium text-h hover:text-primary/80 transition-colors duration-300";
-    const linkInactive = "text-text-h hover:text-text-primary transition-colors duration-300";
-    const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const { isAuthenticated, logout } = useAuth();
 
-    const setMenu = () => {
-        setMenuOpen(!menuOpen);
-    }
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 94);
+    };
 
-    //pegar a preferencia do usuário
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
 
-    // const [preferencia, setPreferencia] = useState("light");
-    // const handleToggle = () => {
-    //     setPreferencia(preferencia === "light" ? "dark" : "light");
-    // };
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
-    const [scrolled, setScrolled] = useState(false);
-    
-    useEffect(() => {
+  const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+    isActive
+      ? "text-text-primary font-medium hover:text-primary/80 transition-colors duration-300"
+      : "text-text-h hover:text-text-primary transition-colors duration-300";
 
-        const handleScroll = () => {
-            setScrolled(window.scrollY > 94);
-        };
+  const menuLinkClass =
+    "text-text-h hover:text-text-primary hover:bg-text-primary-bg active:bg-text-primary-bg px-4 py-2 rounded transition-colors";
 
-        window.addEventListener("scroll", handleScroll);
+  return (
+    <header
+      className={`fixed top-0 left-0 z-50 flex h-16 w-full items-center justify-center px-4 transition-all duration-300 ${
+        scrolled ? "bg-background/70 shadow-md backdrop-blur-md" : "bg-transparent"
+      }`}
+    >
+      <div className="flex h-full w-full items-center justify-between gap-4">
+        {/* Logo */}
+        <NavLink to="/" className="mr-auto flex w-34.5 items-center">
+          <h1 className="text-2xl font-bold">estate</h1>
+          <p className="text-2xl font-medium text-text-primary">flow</p>
+        </NavLink>
 
-        return () => {
-            window.removeEventListener("scroll", handleScroll);
-        };
+        {/* Links desktop */}
+        <nav className="mx-auto hidden items-center justify-evenly gap-4 md:flex">
+          <NavLink to="/" className={navLinkClass}>
+            Início
+          </NavLink>
 
-    }, []);
+          <NavLink to="/properties" className={navLinkClass}>
+            Imóveis
+          </NavLink>
 
+          <NavLink to="/about" className={`${navLinkClass} text-nowrap`}>
+            Sobre nós
+          </NavLink>
 
-    const navigate = useNavigate();
-    const isLoggedIn = true; //mudar ao fazer login
+          <NavLink to="/services" className={navLinkClass}>
+            Serviços
+          </NavLink>
 
-  return (    
-    <div className={` w-full p-4 h-16 z-50 fixed flex items-center justify-center ${scrolled ? "bg-background/70 backdrop-blur-md shadow-md " : "bg-transparent"} `}>
-        <div className="w-full flex h-16 items-center gap-4 justify-between">
-            <div className="flex items-center mr-auto w-34.5">
-                <h1 className="text-2xl font-bold">estate</h1>
-                <p className="text-2xl text-text-primary font-medium">flow</p>
-            </div>
-            <div className="gap-4 ml:auto mr:auto hidden md:flex justify-evenly lg:flex items-center">
-                {/* <Pesquisa/> */}
-                <Link to="/" className={`${linkActive} text-h`}>Início</Link>
-                <Link to="/properties" className={`${linkInactive} text-h`}>Imóveis</Link>
-                <Link to="/about" className={`${linkInactive} text-h text-nowrap`}>Sobre nós</Link>
-                <Link to="/services" className={`${linkInactive} text-h`}>Serviços</Link>
-                <Link to="/contact" className={`${linkInactive} text-h`}>Contato</Link>
-                {/* <Button onClick={() => handleToggle()}>{preferencia === "light" ? <Lightbulb/> : <LightbulbOffIcon/>}</Button> */}
-            </div>
-            {/* mudar ao fazer login */}
-            {(isLoggedIn) ? (
-                <div className="flex items-center">
-                    {/* <div className="hidden md:flex lg:flex gap-4 mr-4">
-                        <div className=" flex items-center gap-2">
-                            <h3 className="text-h ml-4">Ola, Joao</h3>
-                            <img className="h-12 rounded-full mr-4 " src="https://api.dicebear.com/9.x/adventurer/svg?seed=Felix" alt="" />
-                        </div>
-                    </div> */}
-                    <div className="flex gap-2 mr-4">
-                        <button onClick={setMenu} ><Menu/></button>
-                        {menuOpen && (
-                            <div className="absolute top-16 right-6 bg-card shadow-2xl rounded-md p-4 flex flex-col gap-2">
-                                <Link to="/profile" className={`${linkInactive} text-h hover:bg-text-primary-bg) active:bg-text-primary-bg) px-4 py-2 rounded`}>Perfil</Link>
-                                <Link to="/my-properties" className={`${linkInactive} text-h hover:bg-text-primary-bg) active:bg-text-primary-bg) px-4 py-2 rounded`}>Meus imóveis</Link>
-                                <Link to="/owner" className={`${linkInactive} btext-primary text-h hover:bg-text-primary-bg) active:bg-text-primary-bg) px-4 py-2 rounded`}>Anunciar imóvel</Link>
-                                <button onClick={() => { navigate("/login") }} className={`${linkInactive} text-red-400 px-4 py-2 rounded hover:bg-text-primary-bg) active:bg-text-primary-bg)`}>Sair</button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            ) : (
-            <div className="flex gap-2">
-                <Button className="border bg-transparent text-foreground hover:bg-transparent border-foreground">Login</Button>
-                <Button className="bg-text-primary text-white border-text-primary">Anunicar imóvel</Button>
-            </div>
+          <NavLink to="/contact" className={navLinkClass}>
+            Contato
+          </NavLink>
+        </nav>
+
+        {isAuthenticated ? (
+          <div className="relative flex items-center">
+            <NotificationDropdown buttonClassName="mr-2 rounded-md p-2 hover:bg-muted" iconClassName="h-5 w-5" />
+
+            <button
+              type="button"
+              onClick={() => setMenuOpen((prev) => !prev)}
+              className="mr-4 rounded-md p-2 hover:bg-muted"
+              aria-label="Abrir menu"
+            >
+              {menuOpen ? <X /> : <Menu />}
+            </button>
+
+            {menuOpen && (
+              <div className="absolute right-4 top-14 z-50 flex min-w-48 flex-col gap-2 rounded-md bg-card p-4 shadow-2xl">
+                <NavLink
+                  to="/profile"
+                  onClick={() => setMenuOpen(false)}
+                  className={menuLinkClass}
+                >
+                  Perfil
+                </NavLink>
+
+                <NavLink
+                  to="/chat"
+                  onClick={() => setMenuOpen(false)}
+                  className={`${menuLinkClass} flex items-center gap-2`}
+                >
+                  <MessageCircleMore className="h-4 w-4" />
+                  Mensagens
+                </NavLink>
+
+                <NavLink
+                  to="/favoritos"
+                  onClick={() => setMenuOpen(false)}
+                  className={`${menuLinkClass} flex items-center gap-2`}
+                >
+                  <Heart className="h-4 w-4" />
+                  Favoritos
+                </NavLink>
+
+                <NavLink
+                  to="/my-properties"
+                  onClick={() => setMenuOpen(false)}
+                  className={menuLinkClass}
+                >
+                  Meus imóveis
+                </NavLink>
+
+                <NavLink
+                  to="/owner"
+                  onClick={() => setMenuOpen(false)}
+                  className={menuLinkClass}
+                >
+                  Anunciar imóvel
+                </NavLink>
+
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setMenuOpen(false);
+                    await logout();
+                    navigate("/login");
+                  }}
+                  className="rounded px-4 py-2 text-left text-red-400 transition-colors hover:bg-text-primary-bg active:bg-text-primary-bg"
+                >
+                  Sair
+                </button>
+              </div>
             )}
-        </div>
-    </div>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => navigate("/login")}
+              className="border-foreground bg-transparent text-foreground hover:bg-transparent"
+            >
+              Login
+            </Button>
+
+            <Button
+              onClick={() => navigate("/owner")}
+              className="border-text-primary bg-text-primary text-white"
+            >
+              Anunciar imóvel
+            </Button>
+          </div>
+        )}
+      </div>
+    </header>
   );
 }

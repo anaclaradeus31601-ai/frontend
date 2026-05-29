@@ -1,6 +1,7 @@
 import {
   BarChart3,
   Clipboard,
+  ScrollText,
   Home,
   Settings,
   User,
@@ -65,6 +66,11 @@ export const menuItems : MenuItem[] = [
     icon: Wallet,
     href: "/admin/payments",
   },
+  {
+    label: "Auditoria",
+    icon: ScrollText,
+    href: "/admin/audit",
+  },
 ];
 
 export const bottomItems : BottomItem[] = [
@@ -76,7 +82,7 @@ export const bottomItems : BottomItem[] = [
   {
     label: "Meu Perfil",
     icon: UserCircle,
-    href: "/",
+    href: "/admin/profile",
   },
   {
     label: "Configurações",

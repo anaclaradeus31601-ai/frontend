@@ -5,6 +5,13 @@ import { z } from "zod";
 const requiredText = (field: string) => z.string().trim().min(1, `${field} é obrigatório.`);
 const optionalText = z.string().optional();
 const email = z.string().trim().email("Informe um e-mail válido.");
+const strongPassword = z
+  .string()
+  .min(8, "A senha deve ter pelo menos 8 caracteres.")
+  .regex(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).+$/,
+    "Use letra maiúscula, minúscula, número e caractere especial.",
+  );
 const positiveNumber = (field: string) =>
   z.string().trim().min(1, `${field} é obrigatório.`).refine((value) => Number(value) >= 0, `${field} deve ser maior ou igual a zero.`);
 
@@ -19,10 +26,33 @@ export const registerSchema = z
     name: requiredText("Nome"),
     email: email,
     phone: requiredText("Telefone"),
-    password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres."),
-    confirmPassword: z.string().min(6, "Confirme sua senha."),
+    password: strongPassword,
+    confirmPassword: strongPassword,
   })
   .refine((values) => values.password === values.confirmPassword, {
+    message: "As senhas não coincidem.",
+    path: ["confirmPassword"],
+  });
+
+export const requestEmailVerificationSchema = z.object({
+  email,
+});
+
+export const confirmEmailVerificationSchema = z.object({
+  token: requiredText("Token"),
+});
+
+export const forgotPasswordSchema = z.object({
+  email,
+});
+
+export const resetPasswordSchema = z
+  .object({
+    token: requiredText("Token"),
+    newPassword: strongPassword,
+    confirmPassword: strongPassword,
+  })
+  .refine((values) => values.newPassword === values.confirmPassword, {
     message: "As senhas não coincidem.",
     path: ["confirmPassword"],
   });
@@ -33,6 +63,10 @@ export const createClientSchema = z.object({
   email: email,
   password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres."),
   phone: optionalText,
+  birthDate: optionalText,
+  budget: optionalText,
+  city: optionalText,
+  notes: optionalText,
   avatar: optionalText,
   role: requiredText("Função"),
   emailVerified: z.boolean().optional(),
@@ -254,6 +288,10 @@ export const previewPropertySchema = z.object({
 // ============ TYPES ============
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type RegisterFormData = z.infer<typeof registerSchema>;
+export type RequestEmailVerificationFormData = z.infer<typeof requestEmailVerificationSchema>;
+export type ConfirmEmailVerificationFormData = z.infer<typeof confirmEmailVerificationSchema>;
+export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 export type CreateClientFormData = z.infer<typeof createClientSchema>;
 export type EditClientFormData = z.infer<typeof editClientSchema>;
 export type CreateOwnerFormData = z.infer<typeof createOwnerSchema>;

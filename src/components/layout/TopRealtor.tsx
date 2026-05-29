@@ -7,12 +7,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "#components/ui/dropdown-menu";
-import { Bell, ChevronDown, LogOut, Search, Settings, User } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ChevronDown, LogOut, Search, Settings, User } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/auth-context";
+import NotificationDropdown from "./NotificationDropdown";
 
 const actionButton = "h-10 w-10 rounded-full bg-muted flex items-center justify-center hover:bg-accent transition-colors";
 
 export default function TopRealtor() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const formattedDate = new Date().toLocaleDateString("pt-BR", {
     weekday: "long",
     day: "numeric",
@@ -40,21 +44,19 @@ export default function TopRealtor() {
           <Settings className="h-5 w-5" />
         </Link>
 
-        <Link to="/realtor/notifications" className={actionButton}>
-          <Bell className="h-5 w-5" />
-        </Link>
+        <NotificationDropdown buttonClassName={actionButton} viewAllHref="/realtor/notifications" />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-2 rounded-full p-1 pr-3 transition-colors hover:bg-accent">
               <Avatar className="h-10 w-10">
-                <AvatarImage src="https://github.com/shadcn.png" />
-                <AvatarFallback>CR</AvatarFallback>
+                <AvatarImage src={user?.avatar ?? "https://github.com/shadcn.png"} />
+                <AvatarFallback>{user?.name?.slice(0, 2).toUpperCase() ?? "CR"}</AvatarFallback>
               </Avatar>
 
               <div className="hidden flex-col items-start md:flex">
-                <span className="text-sm font-medium">Corretor</span>
-                <span className="text-xs text-muted-foreground">Realtor</span>
+                <span className="text-sm font-medium">{user?.name ?? "Corretor"}</span>
+                <span className="text-xs text-muted-foreground">{user?.role ?? "REALTOR"}</span>
               </div>
 
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
@@ -77,7 +79,13 @@ export default function TopRealtor() {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-red-500 focus:text-red-500">
+            <DropdownMenuItem
+              className="text-red-500 focus:text-red-500"
+              onClick={async () => {
+                await logout();
+                navigate("/login/corretor");
+              }}
+            >
               <LogOut className="mr-2 h-4 w-4" />
               Sair
             </DropdownMenuItem>

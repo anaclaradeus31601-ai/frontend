@@ -1,7 +1,7 @@
 // lib/api.ts
 import type { QueryParams } from "../types/database";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL?.replace(/\/$/, "") ?? "";
+export const API_BASE_URL = import.meta.env.VITE_API_URL?.replace(/\/$/, "") ?? "";
 let refreshRequest: Promise<boolean> | null = null;
 
 function buildQueryString(params?: QueryParams) {
@@ -26,6 +26,18 @@ function buildQueryString(params?: QueryParams) {
 export function buildApiUrl(path: string, params?: QueryParams) {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   return `${API_BASE_URL}${normalizedPath}${buildQueryString(params)}`;
+}
+
+export function getSocketServerUrl() {
+  if (!API_BASE_URL) {
+    return null;
+  }
+
+  try {
+    return new URL(API_BASE_URL).origin;
+  } catch {
+    return API_BASE_URL;
+  }
 }
 
 export async function apiRequest<TResponse>(

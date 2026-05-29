@@ -1,4 +1,5 @@
 import { Button } from "#components/ui/button";
+import { VisitCalendar } from "#components/visits/visit-calendar";
 import { Input } from "#components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "#components/ui/table";
 import { useVisits } from "#hooks/use-visits";
@@ -55,6 +56,26 @@ export default function IndexVisits() {
         </Button>
       </div>
       <div className="overflow-x-auto border rounded-2xl">
+        <VisitCalendar
+          visits={filteredVisits}
+          title="Agenda mensal de visitas"
+          emptyMessage="Nenhuma visita marcada neste dia."
+          renderMeta={(visit) => `${visit.client?.name ?? "Cliente não informado"} · ${visit.realtor?.name ?? "Corretor não informado"}`}
+          renderActions={(visit) => (
+            <>
+              <Button variant="outline" size="sm" onClick={() => navigate(`/admin/visits/${visit.id}`)}>
+                <Eye className="mr-2 h-4 w-4" />
+                Ver
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => navigate(`/admin/visits/edit/${visit.id}`)}>
+                <Pencil className="mr-2 h-4 w-4" />
+                Editar
+              </Button>
+            </>
+          )}
+        />
+      </div>
+      <div className="overflow-x-auto border rounded-2xl">
         <Table>
           <TableHeader>
             <TableRow>
@@ -78,10 +99,10 @@ export default function IndexVisits() {
             ) : (
               filteredVisits.map((visit) => (
                 <TableRow key={visit.id} className="border-t">
-                  <TableCell className="text-center">{visit.property?.title ?? visit.propertyId}</TableCell>
-                  <TableCell className="text-center">{visit.client?.name ?? visit.clientId}</TableCell>
+                  <TableCell className="text-center">{visit.property?.title ?? "Imóvel não informado"}</TableCell>
+                  <TableCell className="text-center">{visit.client?.name ?? "Cliente não informado"}</TableCell>
                   <TableCell className="text-center">{formatDateTime(visit.scheduledAt)}</TableCell>
-                  <TableCell className="text-center">{visit.realtor?.name ?? visit.realtorId}</TableCell>
+                  <TableCell className="text-center">{visit.realtor?.name ?? "Corretor não informado"}</TableCell>
                   <TableCell className="text-center">{visit.status}</TableCell>
                   <TableCell className="text-center">
                     <Button variant="outline" size="sm" className="mr-2" onClick={() => navigate(`/admin/visits/${visit.id}`)}>

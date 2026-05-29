@@ -2,7 +2,7 @@ import { EditForm } from "#components/shared/edit-form";
 import { useUserById } from "#hooks/use-users";
 import { useParams } from "react-router-dom";
 import { UserRole } from "../../../types/database";
-import { editClientSchema } from "../../../validations/forms";
+import { editClientSchema, type EditClientFormData } from "../../../validations/forms";
 
 export default function EditClients() {
   const { id } = useParams();
@@ -32,10 +32,10 @@ export default function EditClients() {
         email: client.email,
         phone: client.phone ?? "",
         cpf: "",
-        birthDate: "",
-        budget: "",
-        city: "",
-        notes: "",
+        birthDate: client.birthDate ?? "",
+        budget: client.budget ?? "",
+        city: client.city ?? "",
+        notes: client.notes ?? "",
       }}
       fields={[
         { name: "name", label: "Nome completo", type: "text", required: true, span: "full" },
@@ -47,10 +47,14 @@ export default function EditClients() {
         { name: "city", label: "Cidade de interesse", type: "text" },
         { name: "notes", label: "Observações", type: "textarea", span: "full" },
       ]}
-      transformPayload={(data: any) => ({
+      transformPayload={(data: EditClientFormData) => ({
         name: data.name,
         email: data.email,
         phone: data.phone || null,
+        birthDate: data.birthDate || null,
+        budget: data.budget || null,
+        city: data.city || null,
+        notes: data.notes || null,
         role: UserRole.CLIENT,
       })}
     />

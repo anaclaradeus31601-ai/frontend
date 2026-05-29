@@ -1,5 +1,6 @@
 import type { Property } from "../../types/database";
 import PropertyCard from "./property-card";
+import { useFavoritePropertyIds } from "../../hooks/use-favorites";
 
 interface PropertyGridProps {
   properties: Property[];
@@ -10,6 +11,8 @@ export default function PropertyGrid({
   properties,
   emptyMessage = "Nenhum imóvel encontrado.",
 }: PropertyGridProps) {
+  const { favoriteIds } = useFavoritePropertyIds();
+
   return (
     <div className="w-full px-6 mb-9 flex items-center justify-center">
       {properties.length === 0 ? (
@@ -19,7 +22,11 @@ export default function PropertyGrid({
       ) : (
         <div className="w-full place-items-center grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-y-12">
           {properties.map((property) => (
-            <PropertyCard key={property.id} property={property} />
+            <PropertyCard
+              key={property.id}
+              property={property}
+              isFavorite={property.isFavorite ?? favoriteIds.has(property.id)}
+            />
           ))}
         </div>
       )}

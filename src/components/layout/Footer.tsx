@@ -23,6 +23,7 @@ export default function Footer() {
                         <li><Link to="/about">Sobre nós</Link></li>
                         <li><Link to="/services">Serviços</Link></li>
                         <li><Link to="/contact">Contato</Link></li>
+                        <li><Link to="/owner">Anunciar imóvel</Link></li>
                     </ul>
                 </div>
                 <div className="flex flex-col items-center">

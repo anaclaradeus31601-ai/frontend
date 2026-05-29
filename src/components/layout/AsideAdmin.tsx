@@ -19,8 +19,8 @@ export default function AdminHeader() {
   return (
     <aside
       className={cn(
-        "h-screen border-r bg-background transition-all duration-300",
-        menuOpen ? "w-64" : "w-20"
+        "sticky top-0 h-screen shrink-0 overflow-x-hidden border-r border-border/60 bg-background/95 backdrop-blur transition-all duration-300",
+        menuOpen ? "w-64 scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600" : "w-20"
       )}
     >
       {/* Header */}
@@ -47,7 +47,7 @@ export default function AdminHeader() {
       </div>
 
       {/* Menu */}
-      <nav className="mt-4 flex flex-col gap-1 px-3">
+      <nav className="mt-4 flex min-w-0 flex-col gap-1 px-3">
         {menuItems.map((item) => {
           const Icon = item.icon;
 
@@ -56,13 +56,13 @@ export default function AdminHeader() {
               <Button
                 variant="ghost"
                 className={cn(
-                  "w-full justify-start gap-3",
+                  "w-full min-w-0 justify-start gap-3 overflow-hidden rounded-xl px-3 text-slate-700 transition-colors hover:bg-muted/70 hover:text-foreground dark:text-slate-200 dark:hover:bg-muted/50",
                   !menuOpen && "justify-center"
                 )}
               >
                 <Icon className="h-5 w-5 shrink-0" />
 
-                {menuOpen && <span>{item.label}</span>}
+                {menuOpen && <span className="truncate">{item.label}</span>}
               </Button>
             </NavLink>
           );
@@ -78,13 +78,13 @@ export default function AdminHeader() {
               <Button
                 variant="ghost"
                 className={cn(
-                  "w-full justify-start gap-3",
+                  "w-full min-w-0 justify-start gap-3 overflow-hidden rounded-xl px-3 text-slate-700 transition-colors hover:bg-muted/70 hover:text-foreground dark:text-slate-200 dark:hover:bg-muted/50",
                   !menuOpen && "justify-center"
                 )}
               >
                 <Icon className="h-5 w-5 shrink-0" />
 
-                {menuOpen && <span>{item.label}</span>}
+                {menuOpen && <span className="truncate">{item.label}</span>}
               </Button>
             </NavLink>
           );

@@ -4,9 +4,13 @@ import { Separator } from "#components/ui/separator";
 import type { Property } from "../../types/database";
 import { Bath, BedDouble, Heart, MapPin, Ruler } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/auth-context";
+import { useToggleFavorite } from "../../hooks/use-favorites";
+import { cn } from "../../lib/utils";
 
 interface PropertyCardProps {
   property: Property;
+  isFavorite?: boolean;
 }
 
 function formatPrice(property: Property) {
@@ -22,9 +26,23 @@ function formatPrice(property: Property) {
   }).format(price);
 }
 
-export default function PropertyCard({ property }: PropertyCardProps) {
+export default function PropertyCard({ property, isFavorite = false }: PropertyCardProps) {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const toggleFavorite = useToggleFavorite();
   const image = property.images[0] || "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=800&q=80";
+
+  async function handleFavoriteClick() {
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+
+    await toggleFavorite.mutateAsync({
+      propertyId: property.id,
+      isFavorite,
+    });
+  }
 
   return (
     <div className="shadow-2xl bg-card flex flex-col justify-between rounded-2xl w-[90%] h-full min-w-70 min-h-95">
@@ -32,8 +50,14 @@ export default function PropertyCard({ property }: PropertyCardProps) {
         {property.featured && (
           <Badge className="absolute top-8 left-4 bg-text-primary w-20 h-6 rounded-md">Destaque</Badge>
         )}
-        <Button type="button" className="absolute top-6 right-4 rounded-full bg-foreground" size="icon">
-          <Heart />
+        <Button
+          type="button"
+          className="absolute top-6 right-4 rounded-full bg-foreground"
+          size="icon"
+          onClick={handleFavoriteClick}
+          disabled={toggleFavorite.isPending}
+        >
+          <Heart className={cn(isFavorite ? "fill-current text-red-500" : "")} />
         </Button>
         <img className="w-full h-52 object-cover object-top" src={image} alt={property.title} />
       </div>
